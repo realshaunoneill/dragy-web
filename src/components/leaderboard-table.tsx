@@ -4,7 +4,7 @@ import { useState } from "react"
 import { useRouter } from "next/navigation"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/src/components/ui/table"
 import { Badge } from "@/src/components/ui/badge"
-import { ChevronDown, ChevronUp, Award, Zap } from "lucide-react"
+import { ChevronDown, ChevronUp, Award, Zap, CarIcon, Calendar } from "lucide-react"
 import type { CarData, CarList, TimeMetric } from "@/types/car-data"
 
 type SortDirection = "asc" | "desc"
@@ -21,7 +21,7 @@ export default function LeaderboardTable({ data, metric, metricLabel }: Leaderbo
 
 
   const sortedData = [...data].sort((a, b) => {
-    return sortDirection === "asc" ? a.results.toString().localeCompare(b.results.toString()) : b.results.toString().localeCompare(a.results.toString())
+    return sortDirection === "asc" ? parseFloat(a.results) - parseFloat(b.results) : parseFloat(b.results) - parseFloat(a.results)
   })
 
   const toggleSortDirection = () => {
@@ -51,23 +51,24 @@ export default function LeaderboardTable({ data, metric, metricLabel }: Leaderbo
         <TableHeader>
           <TableRow className="bg-muted/50 hover:bg-muted/50">
             <TableHead className="w-12 text-center">Rank</TableHead>
+            <TableHead className="w-12"></TableHead>
             <TableHead>Name</TableHead>
-            <TableHead>Make</TableHead>
-            <TableHead>Model</TableHead>
+            <TableHead>Make & Model</TableHead>
             <TableHead>
               <button className="flex items-center gap-1" onClick={toggleSortDirection}>
                 {metricLabel}
                 {sortDirection === "asc" ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
               </button>
             </TableHead>
-            <TableHead className="hidden sm:table-cell">Year</TableHead>
-            <TableHead className="hidden lg:table-cell">Modifications</TableHead>
+            <TableHead className="hidden md:table-cell">Year</TableHead>
+            <TableHead className="hidden lg:table-cell">Date</TableHead>
+            <TableHead className="hidden sm:table-cell">Power</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
           {sortedData.length === 0 ? (
             <TableRow>
-              <TableCell colSpan={7} className="h-24 text-center">
+              <TableCell colSpan={8} className="h-24 text-center">
                 No results found.
               </TableCell>
             </TableRow>
@@ -82,36 +83,44 @@ export default function LeaderboardTable({ data, metric, metricLabel }: Leaderbo
                   {index < 3 ? (
                     <div className="mx-auto flex h-6 w-6 items-center justify-center rounded-full bg-primary/10">
                       <Award
-                        className={`h-4 w-4 ${index === 0 ? "text-yellow-500" : index === 1 ? "text-gray-400" : "text-amber-600"}`}
+                        className={`h-4 w-4 ${
+                          index === 0 ? "text-yellow-500" : index === 1 ? "text-gray-400" : "text-amber-600"
+                        }`}
                       />
                     </div>
                   ) : (
                     index + 1
                   )}
                 </TableCell>
+                <TableCell className="p-2">
+                  <div className="flex h-8 w-8 items-center justify-center bg-muted/50">
+                    <img className="rounded-md" src={car.icon} alt={car.name} width={32} height={32} />
+                  </div>
+                </TableCell>
                 <TableCell className="font-medium">{car.name}</TableCell>
-                <TableCell>{car.brand_name}</TableCell>
-                <TableCell>{car.models}</TableCell>
+                <TableCell>
+                  <div>
+                    <div className="font-medium">{car.brand_name}</div>
+                    <div className="text-sm text-muted-foreground">{car.models}</div>
+                  </div>
+                </TableCell>
                 <TableCell className="font-bold text-primary">{formatTime(car.results)}</TableCell>
+                <TableCell className="hidden md:table-cell">{car.car_decade}</TableCell>
+                <TableCell className="hidden lg:table-cell">
+                  <div className="flex items-center gap-1 text-sm text-muted-foreground">
+                    <Calendar className="h-3.5 w-3.5" />
+                    {car.testTime}
+                  </div>
+                </TableCell>
                 <TableCell className="hidden sm:table-cell">
-                  {car.car_decade ? (
-                    car.car_decade
+                  {car.power ? (
+                    <div className="flex items-center gap-1">
+                      <Zap className="h-4 w-4 text-amber-500" />
+                      <span>{car.power} hp</span>
+                    </div>
                   ) : (
                     "N/A"
                   )}
-                </TableCell>
-                <TableCell className="hidden lg:table-cell">
-                  <div className="flex flex-wrap gap-1">
-                    {car.modifications && car.modifications.length > 0 ? (
-                      car.modifications.map((mod, i) => (
-                        <Badge key={i} variant="outline" className="bg-muted/50">
-                          {mod}
-                        </Badge>
-                      ))
-                    ) : (
-                      <span className="text-muted-foreground">Stock</span>
-                    )}
-                  </div>
                 </TableCell>
               </TableRow>
             ))
