@@ -5,13 +5,12 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/src/components/ui/ta
 import { Card, CardContent, CardHeader, CardTitle } from "@/src/components/ui/card"
 import { Input } from "@/src/components/ui/input"
 import { Search, Gauge, Trophy, AlertCircle } from "lucide-react"
-import LeaderboardTable from "@/src/components/leaderboard-table"
 import { ThemeSwitcher } from "@/src/components/theme-switcher"
 import { CountrySwitcher } from "@/src/components/country-switcher"
-import type { CarData, TimeMetric } from "@/types/car-data"
+import type { TimeMetric } from "@/types/car-data"
 import { Country, COUNTRY_CODES } from "../constants/countries"
-import useGetLeaderboardData from "./hooks/getLeaderboardData"
 import { ErrorBoundary } from "react-error-boundary"
+import dynamic from "next/dynamic"
 
 const metricLabels = {
   zeroToHundred: "0-100 km/h",
@@ -19,30 +18,10 @@ const metricLabels = {
   quarterMile: "1/4 Mile",
 }
 
-function LeaderboardContent({ 
-  selectedCountry, 
-  currentMetric 
-}: { 
-  selectedCountry: Country; 
-  currentMetric: TimeMetric 
-}) {
-  const { data: carData } = useGetLeaderboardData({ 
-    country: selectedCountry,
-    group: metricLabels[currentMetric] === "0-100 km/h" ? "0" : "1"
-  });
-
-  if (!carData || carData.length === 0) {
-    return <div>No data available</div>
-  }
-
-  return (
-    <LeaderboardTable
-      data={carData}
-      metric={currentMetric}
-      metricLabel={metricLabels[currentMetric]}
-    />
-  );
-}
+const DynamicLeaderboardContent = dynamic(
+  () => import('@/src/components/leaderboard-content'),
+  { ssr: false }
+)
 
 function ErrorFallback({ error, resetErrorBoundary }: { error: Error; resetErrorBoundary: () => void }) {
   return (
@@ -156,7 +135,7 @@ export default function Home() {
                     }}
                   >
                     <Suspense fallback={<LoadingFallback />}>
-                      <LeaderboardContent 
+                      <DynamicLeaderboardContent 
                         selectedCountry={selectedCountry}
                         currentMetric={metric as TimeMetric}
                       />

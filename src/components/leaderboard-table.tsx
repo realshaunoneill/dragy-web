@@ -3,9 +3,8 @@
 import { useState } from "react"
 import { useRouter } from "next/navigation"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/src/components/ui/table"
-import { Badge } from "@/src/components/ui/badge"
-import { ChevronDown, ChevronUp, Award, Zap, CarIcon, Calendar } from "lucide-react"
-import type { CarData, CarList, TimeMetric } from "@/types/car-data"
+import { ChevronDown, ChevronUp, Award, Zap, Calendar } from "lucide-react"
+import type { CarList, TimeMetric } from "@/types/car-data"
 
 type SortDirection = "asc" | "desc"
 
