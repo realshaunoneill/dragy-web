@@ -5,12 +5,12 @@ import { useRouter } from "next/navigation"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/src/components/ui/table"
 import { Badge } from "@/src/components/ui/badge"
 import { ChevronDown, ChevronUp, Award, Zap } from "lucide-react"
-import type { CarData, TimeMetric } from "@/types/car-data"
+import type { CarData, CarList, TimeMetric } from "@/types/car-data"
 
 type SortDirection = "asc" | "desc"
 
 interface LeaderboardTableProps {
-  data: CarData[]
+  data: CarList[]
   metric: TimeMetric
   metricLabel: string
 }
@@ -19,32 +19,25 @@ export default function LeaderboardTable({ data, metric, metricLabel }: Leaderbo
   const router = useRouter()
   const [sortDirection, setSortDirection] = useState<SortDirection>("asc")
 
+
   const sortedData = [...data].sort((a, b) => {
-    const aValue = a[metric]
-    const bValue = b[metric]
-
-    // Handle null or undefined values
-    if (aValue === null || aValue === undefined) return 1
-    if (bValue === null || bValue === undefined) return -1
-
-    // For time metrics, lower is better
-    return sortDirection === "asc" ? aValue - bValue : bValue - aValue
+    return sortDirection === "asc" ? a.results.toString().localeCompare(b.results.toString()) : b.results.toString().localeCompare(a.results.toString())
   })
 
   const toggleSortDirection = () => {
     setSortDirection((prev) => (prev === "asc" ? "desc" : "asc"))
   }
 
-  const formatTime = (time: number | null) => {
+  const formatTime = (time: string) => {
     if (time === null || time === undefined) return "N/A"
 
     // Format based on metric type
     if (metric === "quarterMile") {
       // Format quarter mile time with 3 decimal places
-      return `${time.toFixed(3)}s`
+      return `${time}s`
     } else {
       // Format 0-100 and 100-200 times with 2 decimal places
-      return `${time.toFixed(2)}s`
+      return `${time}s`
     }
   }
 
@@ -58,16 +51,16 @@ export default function LeaderboardTable({ data, metric, metricLabel }: Leaderbo
         <TableHeader>
           <TableRow className="bg-muted/50 hover:bg-muted/50">
             <TableHead className="w-12 text-center">Rank</TableHead>
+            <TableHead>Name</TableHead>
             <TableHead>Make</TableHead>
             <TableHead>Model</TableHead>
-            <TableHead className="hidden md:table-cell">Year</TableHead>
             <TableHead>
               <button className="flex items-center gap-1" onClick={toggleSortDirection}>
                 {metricLabel}
                 {sortDirection === "asc" ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
               </button>
             </TableHead>
-            <TableHead className="hidden sm:table-cell">Power</TableHead>
+            <TableHead className="hidden sm:table-cell">Year</TableHead>
             <TableHead className="hidden lg:table-cell">Modifications</TableHead>
           </TableRow>
         </TableHeader>
@@ -96,16 +89,13 @@ export default function LeaderboardTable({ data, metric, metricLabel }: Leaderbo
                     index + 1
                   )}
                 </TableCell>
-                <TableCell className="font-medium">{car.make}</TableCell>
-                <TableCell>{car.model}</TableCell>
-                <TableCell className="hidden md:table-cell">{car.year}</TableCell>
-                <TableCell className="font-bold text-primary">{formatTime(car[metric])}</TableCell>
+                <TableCell className="font-medium">{car.name}</TableCell>
+                <TableCell>{car.brand_name}</TableCell>
+                <TableCell>{car.models}</TableCell>
+                <TableCell className="font-bold text-primary">{formatTime(car.results)}</TableCell>
                 <TableCell className="hidden sm:table-cell">
-                  {car.power ? (
-                    <div className="flex items-center gap-1">
-                      <Zap className="h-4 w-4 text-amber-500" />
-                      <span>{car.power} hp</span>
-                    </div>
+                  {car.car_decade ? (
+                    car.car_decade
                   ) : (
                     "N/A"
                   )}

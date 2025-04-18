@@ -6,23 +6,17 @@ import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, Command
 import { Popover, PopoverContent, PopoverTrigger } from "@/src/components/ui/popover"
 import { cn } from "@/src/lib/utils"
 import { useState } from "react"
-
-export type Country = {
-  id: string
-  name: string
-  code: string
-}
+import { Country, COUNTRY_CODES } from "../constants/countries"
 
 interface CountrySwitcherProps {
-  countries: Country[]
-  selectedCountry: string
+  selectedCountry: Country;
   onCountryChange: (countryId: string) => void
 }
 
-export function CountrySwitcher({ countries, selectedCountry, onCountryChange }: CountrySwitcherProps) {
+export function CountrySwitcher({ selectedCountry, onCountryChange }: CountrySwitcherProps) {
   const [open, setOpen] = useState(false)
 
-  const selectedCountryData = countries.find((country) => country.id === selectedCountry)
+  const selectedCountryData = COUNTRY_CODES.find((country) => country.id === selectedCountry.id)
 
   return (
     <div className="flex items-center gap-2">
@@ -40,17 +34,17 @@ export function CountrySwitcher({ countries, selectedCountry, onCountryChange }:
             <CommandList>
               <CommandEmpty>No country found.</CommandEmpty>
               <CommandGroup>
-                {countries.map((country) => (
+                {COUNTRY_CODES.map((country) => (
                   <CommandItem
                     key={country.id}
                     value={country.name}
                     onSelect={() => {
-                      onCountryChange(country.id)
+                      onCountryChange(country.id.toString())
                       setOpen(false)
                     }}
                   >
                     <Check
-                      className={cn("mr-2 h-4 w-4", selectedCountry === country.id ? "opacity-100" : "opacity-0")}
+                      className={cn("mr-2 h-4 w-4", selectedCountry.id === country.id ? "opacity-100" : "opacity-0")}
                     />
                     {country.name}
                   </CommandItem>

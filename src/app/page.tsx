@@ -1,117 +1,90 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, Suspense } from "react"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/src/components/ui/tabs"
 import { Card, CardContent, CardHeader, CardTitle } from "@/src/components/ui/card"
 import { Input } from "@/src/components/ui/input"
 import { Search, Gauge, Trophy, AlertCircle } from "lucide-react"
 import LeaderboardTable from "@/src/components/leaderboard-table"
 import { ThemeSwitcher } from "@/src/components/theme-switcher"
-import { CountrySwitcher, type Country } from "@/src/components/country-switcher"
+import { CountrySwitcher } from "@/src/components/country-switcher"
 import type { CarData, TimeMetric } from "@/types/car-data"
+import { Country, COUNTRY_CODES } from "../constants/countries"
+import useGetLeaderboardData from "./hooks/getLeaderboardData"
+import { ErrorBoundary } from "react-error-boundary"
 
-// Default countries if API fails
-const defaultCountries: Country[] = [{ id: "global", name: "Global", code: "GLOBAL" }]
+const metricLabels = {
+  zeroToHundred: "0-100 km/h",
+  hundredToTwoHundred: "100-200 km/h",
+  quarterMile: "1/4 Mile",
+}
 
-// Default car data if API fails
-const defaultCarData: CarData[] = [
-  {
-    id: "1",
-    make: "Tesla",
-    model: "Model S Plaid",
-    year: 2023,
-    zeroToHundred: 2.1,
-    hundredToTwoHundred: 4.3,
-    quarterMile: 9.23,
-    power: 1020,
-    modifications: null,
-  },
-  {
-    id: "2",
-    make: "Porsche",
-    model: "911 Turbo S",
-    year: 2022,
-    zeroToHundred: 2.7,
-    hundredToTwoHundred: 5.9,
-    quarterMile: 10.1,
-    power: 640,
-    modifications: null,
-  },
-]
+function LeaderboardContent({ 
+  selectedCountry, 
+  currentMetric 
+}: { 
+  selectedCountry: Country; 
+  currentMetric: TimeMetric 
+}) {
+  const { data: carData } = useGetLeaderboardData({ 
+    country: selectedCountry,
+    group: metricLabels[currentMetric] === "0-100 km/h" ? "0" : "1"
+  });
+
+  if (!carData || carData.length === 0) {
+    return <div>No data available</div>
+  }
+
+  return (
+    <LeaderboardTable
+      data={carData}
+      metric={currentMetric}
+      metricLabel={metricLabels[currentMetric]}
+    />
+  );
+}
+
+function ErrorFallback({ error, resetErrorBoundary }: { error: Error; resetErrorBoundary: () => void }) {
+  return (
+    <div className="mb-4 rounded-md bg-destructive/10 p-4 text-destructive">
+      <div className="flex items-center gap-2">
+        <AlertCircle className="h-5 w-5" />
+        <p>Something went wrong: {error.message}</p>
+      </div>
+      <button 
+        onClick={resetErrorBoundary}
+        className="mt-2 rounded bg-primary px-4 py-2 text-primary-foreground"
+      >
+        Try again
+      </button>
+    </div>
+  );
+}
+
+function LoadingFallback() {
+  return (
+    <div className="flex justify-center py-16">
+      <div className="h-10 w-10 animate-spin rounded-full border-4 border-primary border-t-transparent"></div>
+    </div>
+  );
+}
 
 export default function Home() {
-  const [carData, setCarData] = useState<CarData[]>(defaultCarData)
-  const [countries, setCountries] = useState<Country[]>(defaultCountries)
-  const [selectedCountry, setSelectedCountry] = useState<string>("global")
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
+  const [selectedCountry, setSelectedCountry] = useState<Country>(COUNTRY_CODES[0])
   const [searchQuery, setSearchQuery] = useState("")
   const [currentMetric, setCurrentMetric] = useState<TimeMetric>("zeroToHundred")
 
-  // Fetch countries
+  // Get selected country from local storage
   useEffect(() => {
-    const fetchCountries = async () => {
-      try {
-        // Use a simple fetch with no content-type validation for countries
-        const response = await fetch("/api/countries")
-
-        if (!response.ok) {
-          throw new Error(`Failed to fetch countries: ${response.status}`)
-        }
-
-        const data = await response.json()
-        setCountries(data)
-      } catch (err) {
-        console.error("Error fetching countries:", err)
-        // Keep using default countries
-      }
+    const storedCountryId = localStorage.getItem("selectedCountry")
+    if (storedCountryId) {
+      setSelectedCountry(COUNTRY_CODES.find((country) => country.id.toString() === storedCountryId) || COUNTRY_CODES[0])
     }
-
-    fetchCountries()
   }, [])
 
-  // Fetch car data
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        setLoading(true)
-        setError(null)
-
-        // Use a simple fetch with no content-type validation
-        const response = await fetch(`/api/car-times?country=${selectedCountry}`)
-
-        if (!response.ok) {
-          throw new Error(`Failed to fetch car data: ${response.status}`)
-        }
-
-        const data = await response.json()
-        setCarData(data)
-      } catch (err) {
-        console.error("Error fetching car data:", err)
-        setError("Failed to load leaderboard data. Using default data.")
-        // Keep using default data
-      } finally {
-        setLoading(false)
-      }
-    }
-
-    fetchData()
-  }, [selectedCountry])
-
   const handleCountryChange = (countryId: string) => {
-    setSelectedCountry(countryId)
-  }
-
-  const filteredData = carData.filter(
-    (car) =>
-      car.make.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      car.model.toLowerCase().includes(searchQuery.toLowerCase()),
-  )
-
-  const metricLabels = {
-    zeroToHundred: "0-100 km/h",
-    hundredToTwoHundred: "100-200 km/h",
-    quarterMile: "1/4 Mile",
+    setSelectedCountry(COUNTRY_CODES.find((country) => country.id.toString() === countryId) || COUNTRY_CODES[0])
+    localStorage.setItem("selectedCountry", countryId)
   }
 
   return (
@@ -130,15 +103,6 @@ export default function Home() {
           </p>
         </div>
 
-        {error && (
-          <div className="mb-4 rounded-md bg-amber-50 p-4 text-amber-800 dark:bg-amber-900/20 dark:text-amber-400">
-            <div className="flex items-center gap-2">
-              <AlertCircle className="h-5 w-5" />
-              <p>{error}</p>
-            </div>
-          </div>
-        )}
-
         <Card className="overflow-hidden border-none bg-background/60 shadow-lg backdrop-blur-sm">
           <CardHeader className="border-b bg-muted/30 px-6">
             <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
@@ -148,7 +112,6 @@ export default function Home() {
               </div>
               <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
                 <CountrySwitcher
-                  countries={countries}
                   selectedCountry={selectedCountry}
                   onCountryChange={handleCountryChange}
                 />
@@ -186,17 +149,19 @@ export default function Home() {
 
               {Object.keys(metricLabels).map((metric) => (
                 <TabsContent key={metric} value={metric} className="p-0">
-                  {loading ? (
-                    <div className="flex justify-center py-16">
-                      <div className="h-10 w-10 animate-spin rounded-full border-4 border-primary border-t-transparent"></div>
-                    </div>
-                  ) : (
-                    <LeaderboardTable
-                      data={filteredData}
-                      metric={metric as TimeMetric}
-                      metricLabel={metricLabels[metric as TimeMetric]}
-                    />
-                  )}
+                  <ErrorBoundary 
+                    FallbackComponent={ErrorFallback}
+                    onReset={() => {
+                      // Reset the state when the error boundary is reset
+                    }}
+                  >
+                    <Suspense fallback={<LoadingFallback />}>
+                      <LeaderboardContent 
+                        selectedCountry={selectedCountry}
+                        currentMetric={metric as TimeMetric}
+                      />
+                    </Suspense>
+                  </ErrorBoundary>
                 </TabsContent>
               ))}
             </Tabs>

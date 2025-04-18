@@ -91,7 +91,7 @@ export function PerformanceDataTable({ data, metric, metricLabel }: PerformanceD
                       </Badge>
                     ) : trend === "improved" ? (
                       <Badge
-                        variant="success"
+                        variant="default"
                         className="bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400"
                       >
                         <TrendingDown className="mr-1 h-3 w-3" />
