@@ -4,7 +4,12 @@ import { Inter } from "next/font/google"
 import "./globals.css"
 import { ThemeProvider } from "@/src/components/theme-provider"
 import { ReactQueryProvider } from '@/src/lib/react-query'
+import { Header } from "@/src/components/Header"
+import { Suspense } from "react"
+import { ErrorBoundary } from "@/src/components/error-boundary"
+import Loading from "./loading"
 import { Footer } from "@/src/components/footer"
+
 const inter = Inter({ subsets: ["latin"] })
 
 export const metadata: Metadata = {
@@ -23,10 +28,19 @@ export default function RootLayout({
       <body className={inter.className}>
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
           <ReactQueryProvider>
-            {children}
+          <main className="flex min-h-screen flex-col bg-gradient-to-b from-background to-muted/20">
+            <div className="container mx-auto px-4 py-8">
+              <Header />
+              <Suspense fallback={<Loading />}>
+                <ErrorBoundary>
+                  {children}
+                </ErrorBoundary>
+              </Suspense>
+              <Footer />
+            </div>
+          </main>
           </ReactQueryProvider>
         </ThemeProvider>
-        <Footer />
       </body>
     </html>
   )

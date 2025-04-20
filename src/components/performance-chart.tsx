@@ -4,18 +4,15 @@ import { useEffect, useRef } from "react"
 import Highcharts from "highcharts"
 import HighchartsReact from "highcharts-react-official"
 import { useTheme } from "next-themes"
-import type { TimeMetric } from "@/types/car-data"
 
 interface PerformanceData {
   date: string
-  zeroToHundred: number | null
-  hundredToTwoHundred: number | null
-  quarterMile: number | null
+  results: number
 }
 
 interface PerformanceChartProps {
   data: PerformanceData[]
-  metric: TimeMetric
+  metric: string
   metricLabel: string
 }
 
@@ -24,7 +21,7 @@ export function PerformanceChart({ data, metric, metricLabel }: PerformanceChart
   const { theme } = useTheme()
 
   // Filter out null values
-  const validData = data.filter((item) => item[metric] !== null)
+  const validData = data.filter((item) => item.results !== null)
 
   // Format the date for display
   const formatDate = (dateStr: string) => {
@@ -35,7 +32,7 @@ export function PerformanceChart({ data, metric, metricLabel }: PerformanceChart
   // Prepare data for Highcharts
   const chartData = validData.map((item) => ({
     x: new Date(item.date).getTime(),
-    y: item[metric],
+    y: item.results,
   }))
 
   // Update chart when theme changes
@@ -95,8 +92,8 @@ export function PerformanceChart({ data, metric, metricLabel }: PerformanceChart
       style: {
         fontFamily: "Inter, sans-serif",
       },
-      spacingBottom: 20, // Add more space at the bottom
-      height: 350, // Fixed height to prevent cutting off
+      spacingBottom: 20,
+      height: 350,
     },
     title: {
       text: undefined,
@@ -119,18 +116,16 @@ export function PerformanceChart({ data, metric, metricLabel }: PerformanceChart
       },
       labels: {
         formatter: function () {
-          return metric === "quarterMile" ? `${this.value.toFixed(3)}s` : `${this.value.toFixed(2)}s`
+          return typeof this.value === 'number' ? `${this.value.toFixed(2)}s` : this.value;
         },
       },
-      // For time metrics, lower is better, so we want to invert the Y axis
       reversed: true,
-      // Add more space for labels
       minPadding: 0.1,
       maxPadding: 0.1,
     },
     tooltip: {
       headerFormat: "<b>{point.x:%b %Y}</b><br/>",
-      pointFormat: `${metricLabel}: {point.y:.${metric === "quarterMile" ? 3 : 2}f}s`,
+      pointFormat: `${metricLabel}: {point.y:.2f}s`,
       shared: true,
     },
     plotOptions: {
@@ -156,8 +151,6 @@ export function PerformanceChart({ data, metric, metricLabel }: PerformanceChart
         color: theme === "dark" ? "#3b82f6" : "#2563eb",
       },
     ],
-    // Add more margin at the bottom
-    margin: [0, 0, 30, 0],
   }
 
   return <HighchartsReact highcharts={Highcharts} options={options} ref={chartRef} />

@@ -3,25 +3,22 @@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/src/components/ui/table"
 import { Badge } from "@/src/components/ui/badge"
 import { TrendingDown, TrendingUp, Minus } from "lucide-react"
-import type { TimeMetric } from "@/types/car-data"
 
 interface PerformanceData {
   date: string
-  zeroToHundred: number | null
-  hundredToTwoHundred: number | null
-  quarterMile: number | null
+  results: number
 }
 
 interface PerformanceDataTableProps {
   data: PerformanceData[]
-  metric: TimeMetric
+  metric: string
   metricLabel: string
 }
 
 export function PerformanceDataTable({ data, metric, metricLabel }: PerformanceDataTableProps) {
   // Filter out null values and sort by date (newest first)
   const validData = [...data]
-    .filter((item) => item[metric] !== null)
+    .filter((item) => item.results !== null)
     .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
 
   // Format the date for display
@@ -30,18 +27,18 @@ export function PerformanceDataTable({ data, metric, metricLabel }: PerformanceD
     return date.toLocaleDateString(undefined, { year: "numeric", month: "short", day: "numeric" })
   }
 
-  // Format the time value based on the metric
+  // Format the time value
   const formatTime = (time: number | null) => {
     if (time === null || time === undefined) return "N/A"
-    return metric === "quarterMile" ? `${time.toFixed(3)}s` : `${time.toFixed(2)}s`
+    return `${time.toFixed(2)}s`
   }
 
   // Calculate the trend compared to the previous entry
   const getTrend = (index: number) => {
     if (index === validData.length - 1) return null // No previous entry to compare
 
-    const current = validData[index][metric]
-    const previous = validData[index + 1][metric]
+    const current = validData[index].results
+    const previous = validData[index + 1].results
 
     if (current === null || previous === null) return null
 
@@ -71,18 +68,18 @@ export function PerformanceDataTable({ data, metric, metricLabel }: PerformanceD
           ) : (
             validData.map((entry, index) => {
               const trend = getTrend(index)
-              const prevValue = index < validData.length - 1 ? validData[index + 1][metric] : null
+              const prevValue = index < validData.length - 1 ? validData[index + 1].results : null
 
               // Calculate difference if both values exist
               let diff = null
-              if (entry[metric] !== null && prevValue !== null) {
-                diff = entry[metric]! - prevValue!
+              if (entry.results !== null && prevValue !== null) {
+                diff = entry.results - prevValue
               }
 
               return (
                 <TableRow key={entry.date}>
                   <TableCell className="font-medium">{formatDate(entry.date)}</TableCell>
-                  <TableCell>{formatTime(entry[metric])}</TableCell>
+                  <TableCell>{formatTime(entry.results)}</TableCell>
                   <TableCell className="text-right">
                     {trend === null ? (
                       <Badge variant="outline" className="ml-auto">
