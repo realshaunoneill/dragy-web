@@ -1,11 +1,11 @@
 "use client"
 
 import { useState } from "react"
-import { useRouter } from "next/navigation"
+import Link from "next/link"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/src/components/ui/table"
 import { ChevronDown, ChevronUp, Award, Zap, Calendar } from "lucide-react"
 import type { CarList, TimeMetric } from "@/types/car-data"
-
+import { useRouter } from "next/navigation"
 type SortDirection = "asc" | "desc"
 
 interface LeaderboardTableProps {
@@ -15,9 +15,8 @@ interface LeaderboardTableProps {
 }
 
 export default function LeaderboardTable({ data, metric, metricLabel }: LeaderboardTableProps) {
-  const router = useRouter()
   const [sortDirection, setSortDirection] = useState<SortDirection>("asc")
-
+  const router = useRouter()
 
   const sortedData = [...data].sort((a, b) => {
     return sortDirection === "asc" ? parseFloat(a.results) - parseFloat(b.results) : parseFloat(b.results) - parseFloat(a.results)
@@ -43,7 +42,6 @@ export default function LeaderboardTable({ data, metric, metricLabel }: Leaderbo
   const handleRowClick = (carId: string) => {
     router.push(`/car/${carId}`)
   }
-
   return (
     <div className="overflow-x-auto">
       <Table>
@@ -61,7 +59,6 @@ export default function LeaderboardTable({ data, metric, metricLabel }: Leaderbo
             </TableHead>
             <TableHead className="hidden md:table-cell">Year</TableHead>
             <TableHead className="hidden lg:table-cell">Date</TableHead>
-            <TableHead className="hidden sm:table-cell">Power</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -79,6 +76,11 @@ export default function LeaderboardTable({ data, metric, metricLabel }: Leaderbo
                 onClick={() => handleRowClick(car.id)}
               >
                 <TableCell className="text-center font-medium">
+                  <Link 
+                    id={`car-link-${car.id}`}
+                    href={`/car/${car.id}`}
+                    className="hidden"
+                  />
                   {index < 3 ? (
                     <div className="mx-auto flex h-6 w-6 items-center justify-center rounded-full bg-primary/10">
                       <Award
@@ -110,16 +112,6 @@ export default function LeaderboardTable({ data, metric, metricLabel }: Leaderbo
                     <Calendar className="h-3.5 w-3.5" />
                     {car.testTime}
                   </div>
-                </TableCell>
-                <TableCell className="hidden sm:table-cell">
-                  {car.power ? (
-                    <div className="flex items-center gap-1">
-                      <Zap className="h-4 w-4 text-amber-500" />
-                      <span>{car.power} hp</span>
-                    </div>
-                  ) : (
-                    "N/A"
-                  )}
                 </TableCell>
               </TableRow>
             ))

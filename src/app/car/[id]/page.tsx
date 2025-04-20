@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
+import Link from "next/link"
 import { ArrowLeft, CarIcon, Clock, Gauge, AlertCircle, LineChart, Table2 } from "lucide-react"
 import { Button } from "@/src/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/src/components/ui/card"
@@ -91,7 +92,7 @@ export default function CarDetailsPage({ params }: { params: { id: string } }) {
     }
 
     fetchCarData()
-  }, [params.id])
+  }, [params?.id])
 
   const metricLabels = {
     zeroToHundred: "0-100 km/h",
@@ -115,10 +116,12 @@ export default function CarDetailsPage({ params }: { params: { id: string } }) {
   return (
     <main className="flex min-h-screen flex-col bg-gradient-to-b from-background to-muted/20">
       <div className="container mx-auto px-4 py-8">
-        <Button variant="ghost" className="mb-6 flex items-center gap-2" onClick={() => router.push("/")}>
-          <ArrowLeft className="h-4 w-4" />
-          Back to Leaderboard
-        </Button>
+        <Link href="/" passHref>
+          <Button variant="ghost" className="mb-6 flex items-center gap-2">
+            <ArrowLeft className="h-4 w-4" />
+            Back to Leaderboard
+          </Button>
+        </Link>
 
         {error && (
           <div className="mb-4 rounded-md bg-amber-50 p-4 text-amber-800 dark:bg-amber-900/20 dark:text-amber-400">

@@ -4,7 +4,7 @@ import { Inter } from "next/font/google"
 import "./globals.css"
 import { ThemeProvider } from "@/src/components/theme-provider"
 import { ReactQueryProvider } from '@/src/lib/react-query'
-
+import { Footer } from "@/src/components/footer"
 const inter = Inter({ subsets: ["latin"] })
 
 export const metadata: Metadata = {
@@ -26,6 +26,7 @@ export default function RootLayout({
             {children}
           </ReactQueryProvider>
         </ThemeProvider>
+        <Footer />
       </body>
     </html>
   )
