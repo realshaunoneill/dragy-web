@@ -15,10 +15,11 @@ import useGetUserAndTimeData from "@/src/app/hooks/getUserAndTimeData";
 
 interface CarDetailsContentProps {
   userId: string;
+  carId: string;
 }
 
-export function CarDetailsContent({ userId }: CarDetailsContentProps) {
-    const { data } = useGetUserAndTimeData({ userId  });
+export function CarDetailsContent({ userId, carId }: CarDetailsContentProps) {
+    const { data } = useGetUserAndTimeData({ userId, carId });
 
     const userData = data?.userData[0];
     const timeData = data?.timeData;

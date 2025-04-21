@@ -3,9 +3,10 @@ import { CarTime, UserDetails } from '@/types/car-data';
 
 interface Props {
     userId?: string;
+    carId?: string;
 }
 
-async function getUserAndTimeData(userId?: string) {
+async function getUserAndTimeData(userId?: string, carId?: string) {
   if (!userId) {
     return { userData: [], timeData: [] };
   }
@@ -18,11 +19,6 @@ async function getUserAndTimeData(userId?: string) {
 
   console.log('userData', userData);
 
-  // const carId = userData.data.find((user: UserDetails) => user.garage.id)?.garage.id;
-  const carId = userData.data[0].id;
-
-  console.log('carId', carId);
-
   const timeResponse = await fetch(`/api/times?carId=${carId}`);
   if (!timeResponse.ok) {
     throw new Error('Failed to fetch car time data');
@@ -34,11 +30,10 @@ async function getUserAndTimeData(userId?: string) {
   return { userData: userData.data, timeData };
 }
 
-const useGetUserAndTimeData = ({ userId }: Props): UseQueryResult<{ userData: UserDetails[], timeData: CarTime[] }> => {
+const useGetUserAndTimeData = ({ userId, carId }: Props): UseQueryResult<{ userData: UserDetails[], timeData: CarTime[] }> => {
   return useQuery({
-    queryKey: ['USER_AND_TIME_DATA', userId],
-    staleTime: 0,
-    queryFn: () => getUserAndTimeData(userId),
+    queryKey: ['USER_AND_TIME_DATA', userId, carId],
+    queryFn: () => getUserAndTimeData(userId, carId),
   });
 };
 
