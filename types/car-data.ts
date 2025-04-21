@@ -236,7 +236,7 @@ export interface CarDetailsResponse {
   err: number
   errMsg: string
   data: {
-    car_list: CarDetails[]
+    carResults: CarDetails[]
   }
   selfChanged: {}
 }

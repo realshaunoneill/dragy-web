@@ -40,15 +40,11 @@ export async function GET(request: Request) {
 
     const json = await response.json() as CarDetailsResponse;
 
-    return NextResponse.json(json);
+    if (!json.data.carResults || json.data.carResults.length === 0) {
+      return NextResponse.json({ error: "No car details data available" }, { status: 404 })
+    }
 
-    // console.log('json', json);
-
-    // if (!json.data.car_list || json.data.car_list.length === 0) {
-    //   return NextResponse.json({ error: "No car details data available" }, { status: 404 })
-    // }
-
-    // return NextResponse.json(json.data.car_list);
+    return NextResponse.json(json.data.carResults);
   } catch (error) {
     console.error("API error:", error)
     return NextResponse.json({ error: "Failed to fetch car data" }, { status: 500 })

@@ -23,8 +23,9 @@ export function CarDetailsContent({ userId, carId }: CarDetailsContentProps) {
 
     const userData = data?.userData[0];
     const timeData = data?.timeData;
+    const graphData = data?.graphData;
 
-    console.log('userDataRes', userData, timeData, data);
+    console.log('userDataResponse', userData, timeData, graphData);
 
   if (
     !timeData ||
@@ -41,9 +42,9 @@ export function CarDetailsContent({ userId, carId }: CarDetailsContentProps) {
   }
 
 
-  const formatTime = (time: string) => {
+  const formatTime = (time: number) => {
     if (!time) return "N/A";
-    return `${time}s`;
+    return `${time.toFixed(2)}s`;
   };
 
   const formatDisplacement = (displacement?: string) => {
@@ -53,9 +54,9 @@ export function CarDetailsContent({ userId, carId }: CarDetailsContentProps) {
 
   // Transform time data for the chart
   const transformedTimeData = timeData.map((time) => ({
-    date: time.testTime,
-    results: parseFloat(time.results),
-    distance: time.distance,
+    date: time.testtime,
+    results: time.results,
+    distance: time.distance.toString(),
   }));
 
   console.log('transformedTimeData', transformedTimeData);
