@@ -5,8 +5,9 @@ import { Badge } from "@/src/components/ui/badge"
 import { TrendingDown, TrendingUp, Minus } from "lucide-react"
 
 interface PerformanceData {
-  date: string
-  results: number
+  date: string;
+  results: number;
+  distance: number;
 }
 
 interface PerformanceDataTableProps {
@@ -28,9 +29,14 @@ export function PerformanceDataTable({ data, metric, metricLabel }: PerformanceD
   }
 
   // Format the time value
-  const formatTime = (time: number | null) => {
-    if (time === null || time === undefined) return "N/A"
+  const formatTime = (time: number) => {
+    if (!time) return "N/A"
     return `${time.toFixed(2)}s`
+  }
+
+  const formatDistance = (distance: number) => {
+    if (!distance) return "N/A"
+    return `${distance.toFixed(2)}m`
   }
 
   // Calculate the trend compared to the previous entry
@@ -55,6 +61,7 @@ export function PerformanceDataTable({ data, metric, metricLabel }: PerformanceD
           <TableRow className="bg-muted/50 hover:bg-muted/50">
             <TableHead>Date</TableHead>
             <TableHead>{metricLabel}</TableHead>
+            <TableHead>Distance</TableHead>
             <TableHead className="text-right">Change</TableHead>
           </TableRow>
         </TableHeader>
@@ -80,6 +87,7 @@ export function PerformanceDataTable({ data, metric, metricLabel }: PerformanceD
                 <TableRow key={entry.date}>
                   <TableCell className="font-medium">{formatDate(entry.date)}</TableCell>
                   <TableCell>{formatTime(entry.results)}</TableCell>
+                  <TableCell>{formatDistance(entry.distance)}</TableCell>
                   <TableCell className="text-right">
                     {trend === null ? (
                       <Badge variant="outline" className="ml-auto">

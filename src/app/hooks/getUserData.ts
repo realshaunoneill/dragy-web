@@ -2,21 +2,21 @@ import { useQuery, UseQueryResult } from '@tanstack/react-query';
 import { UserDetails } from '@/types/car-data';
 
 interface Props {
-    id: string;
+    userId: string;
 }
 
-async function getUserData(id: string) {
-  const response = await fetch(`/api/user?id=${id}`);
+async function getUserData(userId: string) {
+  const response = await fetch(`/api/user?id=${userId}`);
   if (!response.ok) {
     throw new Error('Failed to fetch user data');
   }
   return response.json();
 }
 
-const useGetUserData = ({ id }: Props): UseQueryResult<UserDetails[]> => {
+const useGetUserData = ({ userId }: Props): UseQueryResult<UserDetails[]> => {
   return useQuery({
-    queryKey: ['USER_DATA', id],
-    queryFn: () => getUserData(id),
+    queryKey: ['USER_DATA', userId],
+    queryFn: () => getUserData(userId),
   });
 };
 

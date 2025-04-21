@@ -39,8 +39,8 @@ export default function LeaderboardTable({ data, metric, metricLabel }: Leaderbo
     }
   }
 
-  const handleRowClick = (carId: string) => {
-    router.push(`/car/${carId}`)
+  const handleRowClick = (userId: string) => {
+    router.push(`/car/${userId}`)
   }
   return (
     <div className="overflow-x-auto">
@@ -73,7 +73,7 @@ export default function LeaderboardTable({ data, metric, metricLabel }: Leaderbo
               <TableRow
                 key={car.id}
                 className={`${index === 0 ? "bg-primary/5" : ""} cursor-pointer transition-colors hover:bg-muted/80`}
-                onClick={() => handleRowClick(car.id)}
+                onClick={() => handleRowClick(car.userId)}
               >
                 <TableCell className="text-center font-medium">
                   <Link 

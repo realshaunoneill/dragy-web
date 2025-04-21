@@ -5,25 +5,33 @@ import { mockSpecificCarData } from "../mock-data";
 // export async function GET(request: Request): Promise<NextResponse<CarListResponse> | NextResponse<{ error: string }>> {
 export async function GET(request: Request) {
   try {
-    const { searchParams } = new URL(request.url)
-    const id = searchParams.get("id");
+    // Properly parse the URL with the full origin
+    const url = new URL(request.url);
+    const carId = url.searchParams.get("carId");
 
-    if (!id) {
+    if (!carId) {
       return NextResponse.json({ error: "No car ID provided" }, { status: 400 })
     }
-    
-    // const response = await fetch(`http://app.godragy.com/dragy/carRanking/getSameTypeAndGarageRank?appVersion=0&id=${id}`);
-    
-    // const json = await response.json() as CarTimeResponse;
 
-    // if (json.data?.data?.length === 0) {
-    //   return NextResponse.json({ error: "No data available" }, { status: 404 })
-    // }
+    console.log('Fetching times for ID:', carId);
+    
+    const apiUrl = `http://app.godragy.com/dragy/carRanking/getSameTypeAndGarageRank?appVersion=0&id=${carId}`;
+    console.log('API URL:', apiUrl);
+    
+    const response = await fetch(apiUrl);
+    
+    const json = await response.json() as CarTimeResponse;
 
-    // return NextResponse.json(json.data.data)
-    return NextResponse.json(mockSpecificCarData.data.data)
+    if (json.data?.data?.length === 0) {
+      return NextResponse.json({ error: "No data available" }, { status: 404 })
+    }
+
+    console.log('Times fetched successfully', json.data);
+
+    return NextResponse.json(json.data.data)
+    // return NextResponse.json(mockSpecificCarData.data.data)
   } catch (error) {
     console.error("API error:", error)
-    return NextResponse.json({ error: "Failed to fetch car data" }, { status: 500 })
+    return NextResponse.json({ error: "Failed to fetch car data: " + (error instanceof Error ? error.message : String(error)) }, { status: 500 })
   }
 }

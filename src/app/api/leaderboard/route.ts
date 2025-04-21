@@ -29,28 +29,30 @@ import { mockLeaderBoardData60, mockLeaderBoardData100 } from "../mock-data";
       return NextResponse.json({ error: "Invalid country code" }, { status: 400 })
     }
     
-    // const response = await fetch(
-    //   "http://app.godragy.com/index.php/app/car_Controller/searchCarRanking?sid=64eee7e1c7d1b0ef52aa110d881b2a0365d68b0e", 
-    //   {
-    //     method: "POST",
-    //     headers: {
-    //       "Content-Type": "application/x-www-form-urlencoded",
-    //     },
-    //     body: formData.toString(),
-    //   }
-    // );
+    const response = await fetch(
+      "http://app.godragy.com/index.php/app/car_Controller/searchCarRanking?sid=64eee7e1c7d1b0ef52aa110d881b2a0365d68b0e", 
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded",
+        },
+        body: formData.toString(),
+      }
+    );
     
-    // const json = await response.json() as CarListResponse;
+    const json = await response.json() as CarListResponse;
 
-    // if (json.data?.car_list?.length === 0) {
-    //   return NextResponse.json({ error: "No data available" }, { status: 404 })
-    // }
-
-    if (group === "0") {
-      return NextResponse.json(mockLeaderBoardData60.data.car_list)
-    } else {
-      return NextResponse.json(mockLeaderBoardData100.data.car_list)
+    if (json.data?.car_list?.length === 0) {
+      return NextResponse.json({ error: "No data available" }, { status: 404 })
     }
+
+    return NextResponse.json(json.data.car_list);
+    
+    // if (group === "0") {
+    //   return NextResponse.json(mockLeaderBoardData60.data.car_list)
+    // } else {
+    //   return NextResponse.json(mockLeaderBoardData100.data.car_list)
+    // }
   } catch (error) {
     console.error("API error:", error)
     return NextResponse.json({ error: "Failed to fetch car data" }, { status: 500 })

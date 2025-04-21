@@ -30,7 +30,7 @@ export function PerformanceChart({ data, metric, metricLabel }: PerformanceChart
   }
 
   // Prepare data for Highcharts
-  const chartData = validData.map((item) => ({
+  const timeData = validData.map((item) => ({
     x: new Date(item.date).getTime(),
     y: item.results,
   }))
@@ -119,14 +119,14 @@ export function PerformanceChart({ data, metric, metricLabel }: PerformanceChart
           return typeof this.value === 'number' ? `${this.value.toFixed(2)}s` : this.value;
         },
       },
-      reversed: true,
+      reversed: true, // For time metrics, lower is better
       minPadding: 0.1,
       maxPadding: 0.1,
     },
     tooltip: {
-      headerFormat: "<b>{point.x:%b %Y}</b><br/>",
-      pointFormat: `${metricLabel}: {point.y:.2f}s`,
       shared: true,
+      headerFormat: "<b>{point.x:%b %Y}</b><br/>",
+      pointFormat: `${metricLabel}: {point.y:.2f}s`
     },
     plotOptions: {
       spline: {
@@ -147,10 +147,13 @@ export function PerformanceChart({ data, metric, metricLabel }: PerformanceChart
       {
         type: "spline",
         name: metricLabel,
-        data: chartData,
+        data: timeData,
         color: theme === "dark" ? "#3b82f6" : "#2563eb",
-      },
+      }
     ],
+    legend: {
+      enabled: false,
+    }
   }
 
   return <HighchartsReact highcharts={Highcharts} options={options} ref={chartRef} />
