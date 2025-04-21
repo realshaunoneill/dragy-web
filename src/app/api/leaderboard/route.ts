@@ -42,12 +42,12 @@ import { mockLeaderBoardData60, mockLeaderBoardData100 } from "../mock-data";
     
     const json = await response.json() as CarListResponse;
 
-    if (json.data?.car_list?.length === 0) {
-      return NextResponse.json({ error: "No data available" }, { status: 404 })
+    if (!json.data.car_list || json.data.car_list.length === 0) {
+      return NextResponse.json({ error: "No leaderboard data available" }, { status: 404 })
     }
 
     return NextResponse.json(json.data.car_list);
-    
+
     // if (group === "0") {
     //   return NextResponse.json(mockLeaderBoardData60.data.car_list)
     // } else {

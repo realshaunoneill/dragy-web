@@ -8,7 +8,7 @@ import { Header } from "@/src/components/Header"
 import { Suspense } from "react"
 import { ErrorBoundary } from "@/src/components/error-boundary"
 import Loading from "./loading"
-import { Footer } from "@/src/components/footer"
+import { Footer } from "@/src/components/Footer"
 
 const inter = Inter({ subsets: ["latin"] })
 

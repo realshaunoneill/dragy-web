@@ -5,12 +5,12 @@ interface Props {
     carId?: string;
 }
 
-async function getCarTimeData(carId?: string) {
+async function getCarTimeData(carId?: string): Promise<CarTime[]> {
   if (!carId) {
     return [];
   }
 
-  const response = await fetch(`/api/times?carId=${carId}`);
+  const response = await fetch(`/api/details?carId=${carId}`);
   if (!response.ok) {
     throw new Error('Failed to fetch car time data');
   }

@@ -41,9 +41,9 @@ export function CarDetailsContent({ userId, carId }: CarDetailsContentProps) {
   }
 
 
-  const formatTime = (time: number) => {
+  const formatTime = (time: string) => {
     if (!time) return "N/A";
-    return `${time.toFixed(2)}s`;
+    return `${time}s`;
   };
 
   const formatDisplacement = (displacement?: string) => {
@@ -53,8 +53,8 @@ export function CarDetailsContent({ userId, carId }: CarDetailsContentProps) {
 
   // Transform time data for the chart
   const transformedTimeData = timeData.map((time) => ({
-    date: time.testtime,
-    results: time.results,
+    date: time.testTime,
+    results: parseFloat(time.results),
     distance: time.distance,
   }));
 

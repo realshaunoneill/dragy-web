@@ -7,7 +7,7 @@ interface Props {
   group: string;
 }
 
-async function getLeaderboardData(country: string, group: string) {
+async function getLeaderboardData(country: string, group: string): Promise<CarList[]> {
   const response = await fetch(`/api/leaderboard?country=${country}&group=${group}`);
   if (!response.ok) {
     throw new Error('Failed to fetch leaderboard data');

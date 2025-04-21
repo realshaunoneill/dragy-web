@@ -22,13 +22,13 @@ export async function GET(request: Request) {
     
     const json = await response.json() as UserDetailsResponse;
 
-    if (json.data?.data?.length === 0) {
-      return NextResponse.json({ error: "No data available" }, { status: 404 })
+    if (!json.data.data || json.data.data.length === 0) {
+      return NextResponse.json({ error: "No user details data available" }, { status: 404 })
     }
 
-    console.log('User details fetched successfully', json);
+    console.log('User details fetched successfully - ', json.data.data[0].username);
 
-    return NextResponse.json(json.data)
+    return NextResponse.json(json.data.data)
     // return NextResponse.json(mockUserDetailsData.data.data)
   } catch (error) {
     console.error("API error:", error)

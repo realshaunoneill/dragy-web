@@ -22,8 +22,8 @@ export async function GET(request: Request) {
     
     const json = await response.json() as CarTimeResponse;
 
-    if (json.data?.data?.length === 0) {
-      return NextResponse.json({ error: "No data available" }, { status: 404 })
+    if (!json.data.data || json.data.data.length === 0) {
+      return NextResponse.json({ error: "No car time data available" }, { status: 404 })
     }
 
     console.log('Times fetched successfully', json.data);

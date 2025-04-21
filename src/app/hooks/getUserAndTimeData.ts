@@ -1,12 +1,12 @@
 import { useQuery, UseQueryResult } from '@tanstack/react-query';
-import { CarTime, UserDetails } from '@/types/car-data';
+import { CarDetails, UserDetails } from '@/types/car-data';
 
 interface Props {
     userId?: string;
     carId?: string;
 }
 
-async function getUserAndTimeData(userId?: string, carId?: string) {
+async function getUserAndTimeData(userId?: string, carId?: string): Promise<{ userData: UserDetails[], timeData: CarDetails[] }> {
   if (!userId) {
     return { userData: [], timeData: [] };
   }
@@ -15,22 +15,22 @@ async function getUserAndTimeData(userId?: string, carId?: string) {
   if (!response.ok) {
     throw new Error('Failed to fetch user data');
   }
-  const userData = await response.json();
+  const userData = await response.json() as UserDetails[];
 
   console.log('userData', userData);
 
-  const timeResponse = await fetch(`/api/times?carId=${carId}`);
+  const timeResponse = await fetch(`/api/details?id=${carId}`);
   if (!timeResponse.ok) {
     throw new Error('Failed to fetch car time data');
   }
-  const timeData = await timeResponse.json();
+  const timeData = await timeResponse.json() as CarDetails[];
 
-  console.log('HOOK DATA', { userData: userData.data, timeData });
+  console.log('HOOK DATA', { userData, timeData });
   
-  return { userData: userData.data, timeData };
+  return { userData, timeData };
 }
 
-const useGetUserAndTimeData = ({ userId, carId }: Props): UseQueryResult<{ userData: UserDetails[], timeData: CarTime[] }> => {
+const useGetUserAndTimeData = ({ userId, carId }: Props): UseQueryResult<{ userData: UserDetails[], timeData: CarDetails[] }> => {
   return useQuery({
     queryKey: ['USER_AND_TIME_DATA', userId, carId],
     queryFn: () => getUserAndTimeData(userId, carId),

@@ -5,7 +5,7 @@ interface Props {
     userId: string;
 }
 
-async function getUserData(userId: string) {
+async function getUserData(userId: string): Promise<UserDetails[]> {
   const response = await fetch(`/api/user?id=${userId}`);
   if (!response.ok) {
     throw new Error('Failed to fetch user data');

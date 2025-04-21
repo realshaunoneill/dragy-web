@@ -184,3 +184,59 @@ export interface UserDetailsResponse {
   };
   msg: string;
 }
+
+export interface CarDetails {
+  dsc: string
+  iconList: string
+  addTime: string
+  address: string
+  userChineseName: any
+  type: string
+  graph_data: string
+  temperature: string
+  alias: string
+  models: string
+  slope: string
+  acceleration: string
+  modified: string
+  likeNum: string
+  commentNum: string
+  results: string
+  name: string
+  icon: string
+  distance: string
+  height_difference: string
+  modifiedId: string
+  userId: string
+  gender: string
+  series: string
+  car_decade: string
+  drive_mode: string
+  intakeFrom: string
+  displacement: string
+  brand_name: string
+  modifiedBrandIds: string
+  appVersion: string
+  version: string
+  garageId: string
+  longitude: string
+  latitude: string
+  altitude: string
+  density: string
+  max_g_value: string
+  testTime: string
+  likeType: number
+  country: string
+  iso2: string
+  city: string
+  province: string
+}
+
+export interface CarDetailsResponse {
+  err: number
+  errMsg: string
+  data: {
+    car_list: CarDetails[]
+  }
+  selfChanged: {}
+}

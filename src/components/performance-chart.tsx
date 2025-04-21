@@ -8,6 +8,7 @@ import { useTheme } from "next-themes"
 interface PerformanceData {
   date: string
   results: number
+  distance: string
 }
 
 interface PerformanceChartProps {

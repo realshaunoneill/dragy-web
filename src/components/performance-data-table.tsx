@@ -7,7 +7,7 @@ import { TrendingDown, TrendingUp, Minus } from "lucide-react"
 interface PerformanceData {
   date: string;
   results: number;
-  distance: number;
+  distance: string;
 }
 
 interface PerformanceDataTableProps {
@@ -34,9 +34,9 @@ export function PerformanceDataTable({ data, metric, metricLabel }: PerformanceD
     return `${time.toFixed(2)}s`
   }
 
-  const formatDistance = (distance: number) => {
+  const formatDistance = (distance: string) => {
     if (!distance) return "N/A"
-    return `${distance.toFixed(2)}m`
+    return `${distance}m`
   }
 
   // Calculate the trend compared to the previous entry
