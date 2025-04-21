@@ -12,6 +12,7 @@ import { PerformanceChart } from "@/src/components/performance-chart";
 import { PerformanceDataTable } from "@/src/components/performance-data-table";
 import useGetCarTimeData from "@/src/app/hooks/getCarTimeData";
 import useGetUserAndTimeData from "@/src/app/hooks/getUserAndTimeData";
+import { DataInfo } from "@/types/car-data";
 
 interface CarDetailsContentProps {
   userId: string;
@@ -61,6 +62,67 @@ export function CarDetailsContent({ userId, carId }: CarDetailsContentProps) {
 
   console.log('transformedTimeData', transformedTimeData);
 
+  const buildTimeSeriesData = () => {
+    try {
+      if (!graphData) {
+        console.error('No graph data available');
+        return {
+          intervalTime: [],
+          accelerationData: [],
+          speedData: [],
+        };
+      }
+
+      const graphDataObj = JSON.parse(graphData.graph_data);
+      const dataInfoObj = JSON.parse(graphDataObj.dataInfo) as DataInfo;
+
+      const timeDataWithTimes = dataInfoObj.dataArr.filter((item) => item.time)
+
+      
+      const intervalTime = dataInfoObj.detail.map((item) => ({
+        name: item.name,
+        time: item.time,
+      }))
+
+      const accelerationData = timeDataWithTimes.map((item) => ({
+        time: item.time,
+        acceleration: parseFloat(item.acceleration.toFixed(2)),
+      }))
+
+      const speedData = timeDataWithTimes.map((item) => ({
+        time: item.time,
+        speed: parseFloat(item.speed.toFixed(0)),
+      }))
+
+    //   Add a base 0 point
+    accelerationData.unshift({
+      time: 0,
+      acceleration: 0,
+    });
+    speedData.unshift({
+      time: 0,
+      speed: 0,
+    });
+
+      return {
+        intervalTime,
+        accelerationData,
+        speedData,
+      };
+    } catch (error) {
+      console.error('Error building time series data', error);
+      return {
+        intervalTime: [],
+        accelerationData: [],
+        speedData: [],
+      };
+    }
+  };
+
+  const timeSeriesData = buildTimeSeriesData();
+
+  console.log('timeSeriesData', timeSeriesData);
+
   return (
     <div className="space-y-6">
       <div className="flex flex-col gap-3">
@@ -106,7 +168,7 @@ export function CarDetailsContent({ userId, carId }: CarDetailsContentProps) {
             <div className="space-y-6">
               <div className="h-[350px] w-full">
                 <PerformanceChart
-                  data={transformedTimeData}
+                  data={timeSeriesData}
                   metric="results"
                   metricLabel="Time"
                 />

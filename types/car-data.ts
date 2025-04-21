@@ -240,3 +240,35 @@ export interface CarDetailsResponse {
   }
   selfChanged: {}
 }
+
+export interface DataInfo {
+  dataArr: {
+    speed: number
+    heading: number
+    satelliteNum: number
+    sAcc: number
+    acceleration: number
+    headAcc: number
+    sv4: number
+    longitude: number
+    time: number
+    latitude: number
+    hAcc: number
+    accuracy: number
+    altitude: number
+    vAcc: number
+    hDOP: number
+    fixType: number
+  }[]
+  contentMode: any[]
+  detail: Detail[]
+  contentId: any[]
+  relationId: string
+  endSpeedVersion: string
+}
+export interface Detail {
+  seat: number
+  isContent: boolean
+  name: string
+  time: number
+}
