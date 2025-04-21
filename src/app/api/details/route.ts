@@ -40,7 +40,7 @@ export async function GET(request: Request) {
 
     const json = await response.json() as CarDetailsResponse;
 
-    if (!json.data.carResults || json.data.carResults.length === 0) {
+    if (!json.data.carResults) {
       return NextResponse.json({ error: "No car details data available" }, { status: 404 })
     }
 

@@ -6,9 +6,9 @@ interface Props {
     carId?: string;
 }
 
-async function getUserAndTimeData(userId?: string, carId?: string): Promise<{ userData: UserDetails[], timeData: CarTime[], graphData: CarDetails[] }> {
+async function getUserAndTimeData(userId?: string, carId?: string): Promise<{ userData: UserDetails[], timeData: CarTime[], graphData: CarDetails }> {
   if (!userId) {
-    return { userData: [], timeData: [], graphData: [] };
+    return { userData: [], timeData: [], graphData: {} as CarDetails };
   }
 
   const response = await fetch(`/api/user?userId=${userId}`);
@@ -27,14 +27,14 @@ async function getUserAndTimeData(userId?: string, carId?: string): Promise<{ us
   if (!graphResponse.ok) {
     throw new Error('Failed to fetch car time data');
   }
-  const graphData = await graphResponse.json() as CarDetails[];
+  const graphData = await graphResponse.json() as CarDetails;
 
   console.log('HOOK DATA', { userData, timeData, graphData });
   
   return { userData, timeData, graphData };
 }
 
-const useGetUserAndTimeData = ({ userId, carId }: Props): UseQueryResult<{ userData: UserDetails[], timeData: CarTime[], graphData: CarDetails[] }> => {
+const useGetUserAndTimeData = ({ userId, carId }: Props): UseQueryResult<{ userData: UserDetails[], timeData: CarTime[], graphData: CarDetails }> => {
   return useQuery({
     queryKey: ['USER_AND_TIME_DATA', userId, carId],
     queryFn: () => getUserAndTimeData(userId, carId),
