@@ -13,6 +13,7 @@ import { HistoricalDataTable } from "@/src/components/HistoricalDataTable";
 import useGetUserAndTimeData from "@/src/app/hooks/getUserAndTimeData";
 import { DataInfo } from "@/types/car-data";
 import { IntervalDataTable } from "./IntervalDataTable";
+import { useMemo } from "react";
 
 interface CarDetailsContentProps {
   userId: string;
@@ -53,7 +54,7 @@ export function CarDetailsContent({ userId, carId }: CarDetailsContentProps) {
     distance: time.distance.toString(),
   }));
 
-  const buildTimeSeriesData = () => {
+  const timeSeriesData = useMemo(() => {
     try {
       if (!graphData) {
         console.error("No graph data available");
@@ -65,6 +66,15 @@ export function CarDetailsContent({ userId, carId }: CarDetailsContentProps) {
       }
 
       const graphDataObj = JSON.parse(graphData.graph_data);
+
+      if (!graphDataObj.dataInfo) {
+        console.error("No dataInfo available", graphDataObj);
+        return {
+          intervalTime: [],
+          accelerationData: [],
+          speedData: [],
+        };
+      }
       const dataInfoObj = JSON.parse(graphDataObj.dataInfo) as DataInfo;
 
       const timeDataWithTimes = dataInfoObj.dataArr.filter((item) => item.time);
@@ -118,9 +128,7 @@ export function CarDetailsContent({ userId, carId }: CarDetailsContentProps) {
         speedData: [],
       };
     }
-  };
-
-  const timeSeriesData = buildTimeSeriesData();
+  }, [graphData]);
 
   return (
     <div className="space-y-6">
