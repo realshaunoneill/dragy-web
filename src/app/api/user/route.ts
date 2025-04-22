@@ -2,7 +2,6 @@ import { NextResponse } from "next/server"
 import { UserDetailsResponse } from "@/types/car-data";
 import { mockSpecificCarData, mockUserDetailsData } from "../mock-data";
 
-// export async function GET(request: Request): Promise<NextResponse<CarListResponse> | NextResponse<{ error: string }>> {
 export async function GET(request: Request) {
   try {
     // Properly parse the URL with the full URL including origin

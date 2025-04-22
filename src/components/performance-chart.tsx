@@ -26,15 +26,11 @@ interface PerformanceChartProps {
   metricLabel: string
 }
 
-export function PerformanceChart({ data, metric, metricLabel }: PerformanceChartProps) {
+export function PerformanceChart({ data }: PerformanceChartProps) {
   const chartRef = useRef<HighchartsReact.RefObject>(null)
   const { theme } = useTheme()
 
   // Format the date for display
-  const formatDate = (dateStr: string) => {
-    const date = new Date(dateStr)
-    return date.toLocaleDateString(undefined, { month: "short", year: "numeric" })
-  }
 
   // Prepare data for Highcharts
   const timeData = data.accelerationData.map((item) => ({

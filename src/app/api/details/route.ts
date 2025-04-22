@@ -1,9 +1,6 @@
 import { NextResponse } from "next/server"
-import { CarDetailsResponse, CarListResponse } from "@/types/car-data";
-import { COUNTRY_CODES } from "@/src/constants/countries";
-import { mockLeaderBoardData60, mockLeaderBoardData100 } from "../mock-data";
+import { CarDetailsResponse } from "@/types/car-data";
 
-// export async function GET(request: Request): Promise<NextResponse<CarListResponse> | NextResponse<{ error: string }>> {
 export async function GET(request: Request) {
   try {
     const url = new URL(request.url);

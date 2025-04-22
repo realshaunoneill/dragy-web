@@ -3,20 +3,25 @@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/src/components/ui/table"
 import { Badge } from "@/src/components/ui/badge"
 import { TrendingDown, TrendingUp, Minus } from "lucide-react"
+import { useRouter } from "next/navigation";
 
 interface PerformanceData {
   date: string;
   results: number;
   distance: string;
+  eventId: string;
 }
 
 interface HistoricalDataTableProps {
+  userId: string
   data: PerformanceData[]
-  metric: string
   metricLabel: string
+  currentEventId: string
 }
 
-export function HistoricalDataTable({ data, metric, metricLabel }: HistoricalDataTableProps) {
+export function HistoricalDataTable({ userId, data, metricLabel, currentEventId }: HistoricalDataTableProps) {
+  const router = useRouter();
+
   // Filter out null values and sort by date (newest first)
   const validData = [...data]
     .filter((item) => item.results !== null)
@@ -83,8 +88,14 @@ export function HistoricalDataTable({ data, metric, metricLabel }: HistoricalDat
                 diff = entry.results - prevValue
               }
 
+              const isCurrentEvent = entry.eventId === currentEventId;
+
               return (
-                <TableRow key={entry.date}>
+                <TableRow 
+                  key={entry.date} 
+                  onClick={isCurrentEvent ? undefined : () => router.push(`/car/${userId}/${entry.eventId}`)}
+                  className={`${!isCurrentEvent ? 'cursor-pointer' : ''} ${isCurrentEvent ? 'bg-primary/10 hover:bg-primary/15' : ''}`}
+                >
                   <TableCell className="font-medium">{formatDate(entry.date)}</TableCell>
                   <TableCell>{formatTime(entry.results)}</TableCell>
                   <TableCell>{formatDistance(entry.distance)}</TableCell>

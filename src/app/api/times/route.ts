@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server"
 import { CarTimeResponse } from "@/types/car-data";
 
-// export async function GET(request: Request): Promise<NextResponse<CarListResponse> | NextResponse<{ error: string }>> {
 export async function GET(request: Request) {
   try {
     // Properly parse the URL with the full origin

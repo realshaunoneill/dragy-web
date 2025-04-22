@@ -38,9 +38,6 @@ const useGetUserAndTimeData = ({ userId, carId }: Props): UseQueryResult<{ userD
   return useQuery({
     queryKey: ['USER_AND_TIME_DATA', userId, carId],
     queryFn: () => getUserAndTimeData(userId, carId),
-    enabled: !!userId && !!carId,
-    retry: 6,
-    retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000)
   });
 };
 
