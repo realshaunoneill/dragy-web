@@ -9,6 +9,7 @@ import { Suspense } from "react"
 import { ErrorBoundary } from "@/src/components/error-boundary"
 import Loading from "./loading"
 import { Footer } from "@/src/components/Footer"
+import { NuqsAdapter } from "nuqs/adapters/next/app"
 
 const inter = Inter({ subsets: ["latin"] })
 
@@ -28,17 +29,19 @@ export default function RootLayout({
       <body className={inter.className}>
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
           <ReactQueryProvider>
-          <main className="flex min-h-screen flex-col bg-gradient-to-b from-background to-muted/20">
-            <div className="container mx-auto px-4 py-8">
-              <Header />
-              <Suspense fallback={<Loading />}>
-                <ErrorBoundary>
-                  {children}
-                </ErrorBoundary>
-              </Suspense>
-              <Footer />
-            </div>
-          </main>
+            <NuqsAdapter>
+              <main className="flex min-h-screen flex-col bg-gradient-to-b from-background to-muted/20">
+                <div className="container mx-auto px-4 py-8">
+                  <Header />
+                  <Suspense fallback={<Loading />}>
+                    <ErrorBoundary>
+                      {children}
+                    </ErrorBoundary>
+                  </Suspense>
+                  <Footer />
+                </div>
+              </main>
+            </NuqsAdapter>
           </ReactQueryProvider>
         </ThemeProvider>
       </body>

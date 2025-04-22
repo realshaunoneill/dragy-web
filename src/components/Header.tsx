@@ -3,11 +3,11 @@
 import { Gauge, ArrowLeft } from "lucide-react";
 import { ThemeSwitcher } from "./theme-switcher";
 import { Button } from "./ui/button";
-import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 
 export function Header() {
   const pathname = usePathname();
+  const router = useRouter();
 
   const isHomePage = pathname === "/";
 
@@ -26,12 +26,14 @@ export function Header() {
         </p>
       </div>
       {!isHomePage && (
-        <Link href="/" passHref>
-          <Button variant="ghost" className="mb-6 flex items-center gap-2">
-            <ArrowLeft className="h-4 w-4" />
-            Back to Leaderboard
-          </Button>
-        </Link>
+        <Button 
+          variant="ghost" 
+          className="mb-6 flex items-center gap-2"
+          onClick={() => router.back()}
+        >
+          <ArrowLeft className="h-4 w-4" />
+          Back to Leaderboard
+        </Button>
       )}
     </div>
   );

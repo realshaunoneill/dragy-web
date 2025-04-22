@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useEffect } from "react";
 import {
   Tabs,
   TabsContent,
@@ -19,6 +19,7 @@ import { CountrySwitcher } from "@/src/components/country-switcher";
 import { Country, COUNTRY_CODES } from "../constants/countries";
 import dynamic from "next/dynamic";
 import { Metric, METRICS } from "../constants/metrics";
+import { useQueryStates, parseAsString } from "nuqs";
 
 const DynamicLeaderboardContent = dynamic(
   () => import("@/src/components/leaderboard-content"),
@@ -26,31 +27,56 @@ const DynamicLeaderboardContent = dynamic(
 );
 
 export default function Home() {
-  const [selectedCountry, setSelectedCountry] = useState<Country>(
-    COUNTRY_CODES[0]
-  );
-  const [searchQuery, setSearchQuery] = useState("");
-  const [currentMetric, setCurrentMetric] = useState<Metric>("zeroToHundred");
+  // Define URL query state parameters
+  const [{ country, search, metric }, setQueryStates] = useQueryStates({
+    country: parseAsString,
+    search: parseAsString,
+    metric: parseAsString
+  });
 
-  // Get selected country from local storage
+  // Initialize default values if not present in URL
   useEffect(() => {
-    const storedCountryId = localStorage.getItem("selectedCountry");
-    if (storedCountryId) {
-      setSelectedCountry(
-        COUNTRY_CODES.find(
-          (country) => country.id.toString() === storedCountryId
-        ) || COUNTRY_CODES[0]
-      );
+    const updates: Partial<{ country: string, search: string, metric: string }> = {};
+    
+    // Set default country from localStorage or use first country
+    if (!country) {
+      const storedCountryId = localStorage.getItem("selectedCountry");
+      updates.country = storedCountryId || COUNTRY_CODES[0].id.toString();
     }
-  }, []);
+    
+    // Set default metric if not in URL
+    if (!metric || !Object.keys(METRICS).includes(metric)) {
+      updates.metric = "zeroToHundred";
+    }
+    
+    // Apply updates if we have any
+    if (Object.keys(updates).length > 0) {
+      setQueryStates(updates);
+    }
+  }, [country, metric, setQueryStates]);
 
   const handleCountryChange = (countryId: string) => {
-    setSelectedCountry(
-      COUNTRY_CODES.find((country) => country.id.toString() === countryId) ||
-        COUNTRY_CODES[0]
-    );
+    setQueryStates({ country: countryId });
     localStorage.setItem("selectedCountry", countryId);
   };
+
+  const handleSearch = (value: string) => {
+    setQueryStates({ search: value });
+  };
+
+  const handleMetricChange = (value: string) => {
+    if (Object.keys(METRICS).includes(value)) {
+      setQueryStates({ metric: value });
+    }
+  };
+
+  // Find the current country object
+  const currentCountry = COUNTRY_CODES.find(
+    (c) => c.id.toString() === country
+  ) || COUNTRY_CODES[0];
+  
+  // Ensure metric is valid
+  const currentMetric = (Object.keys(METRICS).includes(metric || "") ? metric : "zeroToHundred") as Metric;
 
   return (
     <Card className="overflow-hidden border-none bg-background/60 shadow-lg backdrop-blur-sm">
@@ -62,7 +88,7 @@ export default function Home() {
           </div>
           <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
             <CountrySwitcher
-              selectedCountry={selectedCountry}
+              selectedCountry={currentCountry}
               onCountryChange={handleCountryChange}
             />
             <div className="relative">
@@ -70,8 +96,8 @@ export default function Home() {
               <Input
                 placeholder="Search cars..."
                 className="pl-8 w-full sm:w-[200px]"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
+                value={search || ""}
+                onChange={(e) => handleSearch(e.target.value)}
               />
             </div>
           </div>
@@ -79,19 +105,19 @@ export default function Home() {
       </CardHeader>
       <CardContent className="p-0">
         <Tabs
-          defaultValue="zeroToHundred"
-          onValueChange={(value) => setCurrentMetric(value as Metric)}
+          value={currentMetric}
+          onValueChange={handleMetricChange}
           className="w-full"
         >
           <div className="border-b px-6">
             <TabsList className="flex h-12 w-full justify-start rounded-none border-b-0 bg-transparent p-0">
-              {Object.entries(METRICS).map(([key, metric]) => (
+              {Object.entries(METRICS).map(([key, metricInfo]) => (
                 <TabsTrigger
                   key={key}
                   value={key}
                   className="relative h-12 rounded-none border-b-2 border-transparent bg-transparent px-4 py-3 font-medium text-muted-foreground transition-colors hover:text-foreground data-[state=active]:border-primary data-[state=active]:text-foreground data-[state=active]:shadow-none"
                 >
-                  {metric.label}
+                  {metricInfo.label}
                 </TabsTrigger>
               ))}
             </TabsList>
@@ -100,7 +126,7 @@ export default function Home() {
           {Object.entries(METRICS).map(([key]) => (
             <TabsContent key={key} value={key} className="p-0">
               <DynamicLeaderboardContent
-                selectedCountry={selectedCountry}
+                selectedCountry={currentCountry}
                 currentMetric={key as Metric}
               />
             </TabsContent>
