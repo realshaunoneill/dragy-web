@@ -9,7 +9,6 @@ import { Suspense } from "react"
 import { ErrorBoundary } from "@/src/components/error-boundary"
 import Loading from "./loading"
 import { NuqsAdapter } from "nuqs/adapters/next/app"
-import { Footer } from "../components/Footer"
 
 const inter = Inter({ subsets: ["latin"] })
 
@@ -38,7 +37,6 @@ export default function RootLayout({
                       {children}
                     </ErrorBoundary>
                   </Suspense>
-                  <Footer />
                 </div>
               </main>
             </NuqsAdapter>
