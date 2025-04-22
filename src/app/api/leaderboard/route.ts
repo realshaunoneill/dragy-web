@@ -8,14 +8,14 @@ import { mockLeaderBoardData60, mockLeaderBoardData100 } from "../mock-data";
   try {
     const { searchParams } = new URL(request.url)
     const country = searchParams.get("country") || "global"
-    const group = searchParams.get("group") || "0"
+    const metric = searchParams.get("metric") || "0"
     
     // Create form data with required parameters
     const formData = new URLSearchParams({
       addressId: country,
       brand_name: "",
       car_listId: "1",
-      distance_type: "0",
+      distance_type: metric,
       drive_mode: "",
       models: "",
       num: "100",

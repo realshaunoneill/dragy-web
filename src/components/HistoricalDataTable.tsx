@@ -10,13 +10,13 @@ interface PerformanceData {
   distance: string;
 }
 
-interface PerformanceDataTableProps {
+interface HistoricalDataTableProps {
   data: PerformanceData[]
   metric: string
   metricLabel: string
 }
 
-export function PerformanceDataTable({ data, metric, metricLabel }: PerformanceDataTableProps) {
+export function HistoricalDataTable({ data, metric, metricLabel }: HistoricalDataTableProps) {
   // Filter out null values and sort by date (newest first)
   const validData = [...data]
     .filter((item) => item.results !== null)

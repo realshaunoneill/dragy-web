@@ -42,7 +42,7 @@ export function PerformanceChart({ data, metric, metricLabel }: PerformanceChart
     y: item.acceleration,
   }))
 
-  const speedData = data.speedData.filter((item) => item.speed < 100).map((item) => ({
+  const speedData = data.speedData.map((item) => ({
     x: item.time,
     y: item.speed,
   }))

@@ -16,15 +16,9 @@ import {
 import { Input } from "@/src/components/ui/input";
 import { Search, Trophy } from "lucide-react";
 import { CountrySwitcher } from "@/src/components/country-switcher";
-import type { TimeMetric } from "@/types/car-data";
 import { Country, COUNTRY_CODES } from "../constants/countries";
 import dynamic from "next/dynamic";
-
-const metricLabels = {
-  zeroToHundred: "0-100 km/h",
-  hundredToTwoHundred: "100-200 km/h",
-  quarterMile: "1/4 Mile",
-};
+import { Metric, METRICS } from "../constants/metrics";
 
 const DynamicLeaderboardContent = dynamic(
   () => import("@/src/components/leaderboard-content"),
@@ -36,7 +30,7 @@ export default function Home() {
     COUNTRY_CODES[0]
   );
   const [searchQuery, setSearchQuery] = useState("");
-  const [currentMetric, setCurrentMetric] = useState<TimeMetric>("zeroToHundred");
+  const [currentMetric, setCurrentMetric] = useState<Metric>("zeroToHundred");
 
   // Get selected country from local storage
   useEffect(() => {
@@ -86,28 +80,28 @@ export default function Home() {
       <CardContent className="p-0">
         <Tabs
           defaultValue="zeroToHundred"
-          onValueChange={(value) => setCurrentMetric(value as TimeMetric)}
+          onValueChange={(value) => setCurrentMetric(value as Metric)}
           className="w-full"
         >
           <div className="border-b px-6">
             <TabsList className="flex h-12 w-full justify-start rounded-none border-b-0 bg-transparent p-0">
-              {Object.entries(metricLabels).map(([key, label]) => (
+              {Object.entries(METRICS).map(([key, metric]) => (
                 <TabsTrigger
                   key={key}
-                  value={key}
+                  value={metric.value}
                   className="relative h-12 rounded-none border-b-2 border-transparent bg-transparent px-4 py-3 font-medium text-muted-foreground transition-colors hover:text-foreground data-[state=active]:border-primary data-[state=active]:text-foreground data-[state=active]:shadow-none"
                 >
-                  {label}
+                  {metric.label}
                 </TabsTrigger>
               ))}
             </TabsList>
           </div>
 
-          {Object.keys(metricLabels).map((metric) => (
+          {Object.keys(METRICS).map((metric) => (
             <TabsContent key={metric} value={metric} className="p-0">
               <DynamicLeaderboardContent
                 selectedCountry={selectedCountry}
-                currentMetric={metric as TimeMetric}
+                currentMetric={metric as Metric}
               />
             </TabsContent>
           ))}

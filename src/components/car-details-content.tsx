@@ -9,10 +9,12 @@ import {
 } from "@/src/components/ui/card";
 import { Badge } from "@/src/components/ui/badge";
 import { PerformanceChart } from "@/src/components/performance-chart";
-import { PerformanceDataTable } from "@/src/components/performance-data-table";
+import { HistoricalDataTable } from "@/src/components/HistoricalDataTable";
 import useGetCarTimeData from "@/src/app/hooks/getCarTimeData";
 import useGetUserAndTimeData from "@/src/app/hooks/getUserAndTimeData";
 import { DataInfo } from "@/types/car-data";
+import { IntervalDataTable } from "./IntervalDataTable";
+import { Tabs, TabsList, TabsTrigger } from "./ui/tabs";
 
 interface CarDetailsContentProps {
   userId: string;
@@ -20,19 +22,15 @@ interface CarDetailsContentProps {
 }
 
 export function CarDetailsContent({ userId, carId }: CarDetailsContentProps) {
-    const { data } = useGetUserAndTimeData({ userId, carId });
+  const { data } = useGetUserAndTimeData({ userId, carId });
 
-    const userData = data?.userData[0];
-    const timeData = data?.timeData;
-    const graphData = data?.graphData;
+  const userData = data?.userData[0];
+  const timeData = data?.timeData;
+  const graphData = data?.graphData;
 
-    console.log('userDataResponse', userData, timeData, graphData);
+  console.log("userDataResponse", userData, timeData, graphData);
 
-  if (
-    !timeData ||
-    !userData ||
-    timeData?.length === 0
-  ) {
+  if (!timeData || !userData || !graphData || timeData?.length === 0) {
     return (
       <Card>
         <CardContent className="flex items-center justify-center p-6">
@@ -41,7 +39,6 @@ export function CarDetailsContent({ userId, carId }: CarDetailsContentProps) {
       </Card>
     );
   }
-
 
   const formatTime = (time: number) => {
     if (!time) return "N/A";
@@ -54,18 +51,16 @@ export function CarDetailsContent({ userId, carId }: CarDetailsContentProps) {
   };
 
   // Transform time data for the chart
-  const transformedTimeData = timeData.map((time) => ({
+  const historicalTimeData = timeData.map((time) => ({
     date: time.testtime,
     results: time.results,
     distance: time.distance.toString(),
   }));
 
-  console.log('transformedTimeData', transformedTimeData);
-
   const buildTimeSeriesData = () => {
     try {
       if (!graphData) {
-        console.error('No graph data available');
+        console.error("No graph data available");
         return {
           intervalTime: [],
           accelerationData: [],
@@ -76,33 +71,34 @@ export function CarDetailsContent({ userId, carId }: CarDetailsContentProps) {
       const graphDataObj = JSON.parse(graphData.graph_data);
       const dataInfoObj = JSON.parse(graphDataObj.dataInfo) as DataInfo;
 
-      const timeDataWithTimes = dataInfoObj.dataArr.filter((item) => item.time)
+      const timeDataWithTimes = dataInfoObj.dataArr.filter((item) => item.time);
 
-      
       const intervalTime = dataInfoObj.detail.map((item) => ({
         name: item.name,
         time: item.time,
-      }))
+      }));
 
       const accelerationData = timeDataWithTimes.map((item) => ({
         time: item.time,
         acceleration: parseFloat(item.acceleration.toFixed(2)),
-      }))
+      }));
 
-      const speedData = timeDataWithTimes.map((item) => ({
-        time: item.time,
-        speed: parseFloat(item.speed.toFixed(0)),
-      }))
+      const speedData = timeDataWithTimes
+        .map((item) => ({
+          time: item.time,
+          speed: parseFloat(item.speed.toFixed(0)),
+        }))
+        .filter((item) => item.speed <= 100);
 
-    //   Add a base 0 point
-    accelerationData.unshift({
-      time: 0,
-      acceleration: 0,
-    });
-    speedData.unshift({
-      time: 0,
-      speed: 0,
-    });
+      //   Add a base 0 point
+      accelerationData.unshift({
+        time: 0,
+        acceleration: 0,
+      });
+      speedData.unshift({
+        time: 0,
+        speed: 0,
+      });
 
       return {
         intervalTime,
@@ -110,7 +106,7 @@ export function CarDetailsContent({ userId, carId }: CarDetailsContentProps) {
         speedData,
       };
     } catch (error) {
-      console.error('Error building time series data', error);
+      console.error("Error building time series data", error);
       return {
         intervalTime: [],
         accelerationData: [],
@@ -121,7 +117,11 @@ export function CarDetailsContent({ userId, carId }: CarDetailsContentProps) {
 
   const timeSeriesData = buildTimeSeriesData();
 
-  console.log('timeSeriesData', timeSeriesData);
+  const metricLabels = {
+    zeroToHundred: "0-100 km/h",
+    hundredToTwoHundred: "100-200 km/h",
+    quarterMile: "1/4 Mile",
+  };
 
   return (
     <div className="space-y-6">
@@ -131,24 +131,22 @@ export function CarDetailsContent({ userId, carId }: CarDetailsContentProps) {
             <CarIcon className="h-6 w-6 text-primary" />
           </div>
           <div className="flex flex-col">
-            <h1 className="text-2xl font-bold">
-              {userData.username}
-            </h1>
+            <h1 className="text-2xl font-bold">{userData.username}</h1>
             <div className="flex items-center gap-2">
               <h2 className="text-xl font-semibold">
                 {userData.garage.brandName} {userData.garage.models}
               </h2>
-              <Badge variant="outline">
-                {userData.garage.carDecade}
-              </Badge>
+              <Badge variant="outline">{userData.garage.carDecade}</Badge>
             </div>
           </div>
         </div>
-        
+
         <div className="flex flex-wrap gap-4 text-sm text-muted-foreground">
           <div className="flex items-center gap-1">
             <Gauge className="h-4 w-4" />
-            <span>Displacement: {formatDisplacement(userData.garage.displacement)}</span>
+            <span>
+              Displacement: {formatDisplacement(userData.garage.displacement)}
+            </span>
           </div>
           <div className="flex items-center gap-1">
             <Clock className="h-4 w-4" />
@@ -164,6 +162,22 @@ export function CarDetailsContent({ userId, carId }: CarDetailsContentProps) {
           </div>
         </CardHeader>
         <CardContent className="p-0">
+          <div className="border-b px-6">
+            <Tabs>
+            <TabsList className="flex h-12 w-full justify-start rounded-none border-b-0 bg-transparent p-0">
+              {Object.entries(metricLabels).map(([key, label]) => (
+                <TabsTrigger
+                  key={key}
+                  value={key}
+                  onClick={() => console.log(key)}
+                  className="relative h-12 rounded-none border-b-2 border-transparent bg-transparent px-4 py-3 font-medium text-muted-foreground transition-colors hover:text-foreground data-[state=active]:border-primary data-[state=active]:text-foreground data-[state=active]:shadow-none"
+                >
+                  {label}
+                </TabsTrigger>
+              ))}
+            </TabsList>
+            </Tabs>
+          </div>
           <div className="p-6">
             <div className="space-y-6">
               <div className="h-[350px] w-full">
@@ -174,9 +188,13 @@ export function CarDetailsContent({ userId, carId }: CarDetailsContentProps) {
                 />
               </div>
               <div className="mt-8 border-t pt-4">
+                <h3 className="mb-4 text-lg font-medium">Interval Data</h3>
+                <IntervalDataTable intervalData={timeSeriesData.intervalTime} />
+              </div>
+              <div className="mt-8 border-t pt-4">
                 <h3 className="mb-4 text-lg font-medium">Historical Data</h3>
-                <PerformanceDataTable
-                  data={transformedTimeData}
+                <HistoricalDataTable
+                  data={historicalTimeData}
                   metric="results"
                   metricLabel="Time"
                 />
