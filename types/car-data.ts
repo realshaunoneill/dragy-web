@@ -1,8 +1,3 @@
-export type TimeMetric =
-  | "zeroToHundred"
-  | "hundredToTwoHundred"
-  | "quarterMile";
-
 export interface CarData {
   id: string;
   make: string;

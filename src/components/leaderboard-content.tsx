@@ -9,17 +9,13 @@ import { Loader2 } from "lucide-react";
 interface LeaderboardTableProps {
   selectedCountry: Country;
   currentMetric: Metric;
+  search?: string;
 }
-
-const metricLabels = {
-  zeroToHundred: "0-100 km/h",
-  hundredToTwoHundred: "100-200 km/h",
-  quarterMile: "1/4 Mile",
-};
 
 export default function LeaderboardContent({
   selectedCountry,
   currentMetric,
+  search,
 }: LeaderboardTableProps) {
   const { data: carData, isLoading } = useGetLeaderboardData({
     country: selectedCountry,
@@ -38,11 +34,12 @@ export default function LeaderboardContent({
     return <div className="py-8 text-center text-muted-foreground">No data available</div>;
   }
 
+  const filteredData = search ? carData.filter((car) => car.name.toLowerCase().includes(search.toLowerCase())) : carData;
+
   return (
     <LeaderboardTable
-      data={carData}
+      data={filteredData}
       metric={currentMetric}
-      metricLabel={metricLabels[currentMetric]}
     />
   );
 }

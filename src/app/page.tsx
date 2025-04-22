@@ -16,7 +16,7 @@ import {
 import { Input } from "@/src/components/ui/input";
 import { Search, Trophy } from "lucide-react";
 import { CountrySwitcher } from "@/src/components/country-switcher";
-import { Country, COUNTRY_CODES } from "../constants/countries";
+import { COUNTRY_CODES } from "../constants/countries";
 import dynamic from "next/dynamic";
 import { Metric, METRICS } from "../constants/metrics";
 import { useQueryStates, parseAsString } from "nuqs";
@@ -128,6 +128,7 @@ export default function Home() {
               <DynamicLeaderboardContent
                 selectedCountry={currentCountry}
                 currentMetric={key as Metric}
+                search={search || undefined}
               />
             </TabsContent>
           ))}

@@ -2,14 +2,11 @@
 
 import {
   Calendar,
-  CarIcon,
   Clock,
-  Gauge,
   MapPin,
   Ruler,
   Timer,
   TrendingUp,
-  Trophy,
 } from "lucide-react";
 import {
   Card,
@@ -24,13 +21,15 @@ import useGetUserAndTimeData from "@/src/app/hooks/getUserAndTimeData";
 import { DataInfo } from "@/types/car-data";
 import { IntervalDataTable } from "./IntervalDataTable";
 import { useMemo } from "react";
+import { Metric, METRICS } from "@/src/constants/metrics";
 
 interface CarDetailsContentProps {
   userId: string;
   carId: string;
+  metric: Metric;
 }
 
-export function CarDetailsContent({ userId, carId }: CarDetailsContentProps) {
+export function CarDetailsContent({ userId, carId, metric }: CarDetailsContentProps) {
   const { data } = useGetUserAndTimeData({ userId, carId });
 
   const userData = data?.userData[0];
@@ -54,6 +53,9 @@ export function CarDetailsContent({ userId, carId }: CarDetailsContentProps) {
     if (!time) return "N/A";
     return `${time.toFixed(2)}s`;
   };
+
+  // Get the metric label from the METRICS constant
+  const metricLabel = METRICS[metric]?.label || METRICS.zeroToHundred.label;
 
   // Transform time data for the chart
   const historicalTimeData = timeData.map((time) => ({
@@ -84,6 +86,7 @@ export function CarDetailsContent({ userId, carId }: CarDetailsContentProps) {
           speedData: [],
         };
       }
+      
       const dataInfoObj = JSON.parse(graphDataObj.dataInfo) as DataInfo;
 
       console.log("DataInfo", graphDataObj, dataInfoObj);
@@ -176,7 +179,7 @@ export function CarDetailsContent({ userId, carId }: CarDetailsContentProps) {
             </div>
 
             <div className="flex flex-col gap-4 rounded-lg bg-muted/30 p-4">
-              <h3 className="font-medium">Selected Metric: 0-100mph</h3>
+              <h3 className="font-medium">Selected Metric: {metricLabel}</h3>
               <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
                 <div className="flex flex-col gap-1 rounded-md bg-background/60 p-3">
                   <div className="flex items-center gap-1 text-sm text-muted-foreground">
@@ -235,8 +238,8 @@ export function CarDetailsContent({ userId, carId }: CarDetailsContentProps) {
               <div className="h-[350px] w-full">
                 <PerformanceChart
                   data={timeSeriesData}
-                  metric="results"
-                  metricLabel="Time"
+                  metric={metric}
+                  metricLabel={metricLabel}
                 />
               </div>
               {timeSeriesData.intervalTime.length > 0 && (
@@ -251,7 +254,8 @@ export function CarDetailsContent({ userId, carId }: CarDetailsContentProps) {
                   userId={userId}
                   data={historicalTimeData}
                   currentEventId={carId}
-                  metricLabel="Time"
+                  metricLabel={metricLabel}
+                  metric={metric}
                 />
               </div>
             </div>

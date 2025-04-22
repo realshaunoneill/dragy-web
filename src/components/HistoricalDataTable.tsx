@@ -4,6 +4,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Badge } from "@/src/components/ui/badge"
 import { TrendingDown, TrendingUp, Minus } from "lucide-react"
 import { useRouter } from "next/navigation";
+import { Metric } from "@/src/constants/metrics";
 
 interface PerformanceData {
   date: string;
@@ -17,9 +18,10 @@ interface HistoricalDataTableProps {
   data: PerformanceData[]
   metricLabel: string
   currentEventId: string
+  metric?: Metric
 }
 
-export function HistoricalDataTable({ userId, data, metricLabel, currentEventId }: HistoricalDataTableProps) {
+export function HistoricalDataTable({ userId, data, metricLabel, currentEventId, metric }: HistoricalDataTableProps) {
   const router = useRouter();
 
   // Filter out null values and sort by date (newest first)
@@ -93,7 +95,7 @@ export function HistoricalDataTable({ userId, data, metricLabel, currentEventId 
               return (
                 <TableRow 
                   key={entry.date} 
-                  onClick={isCurrentEvent ? undefined : () => router.push(`/car/${userId}/${entry.eventId}`)}
+                  onClick={isCurrentEvent ? undefined : () => router.push(`/car/${userId}/${entry.eventId}?metric=${metric || 'zeroToHundred'}`)}
                   className={`${!isCurrentEvent ? 'cursor-pointer' : ''} ${isCurrentEvent ? 'bg-primary/10 hover:bg-primary/15' : ''}`}
                 >
                   <TableCell className="font-medium">{formatDate(entry.date)}</TableCell>

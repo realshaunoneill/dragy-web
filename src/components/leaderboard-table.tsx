@@ -4,17 +4,18 @@ import { useState } from "react"
 import Link from "next/link"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/src/components/ui/table"
 import { ChevronDown, ChevronUp, Award, Zap, Calendar } from "lucide-react"
-import type { CarList, TimeMetric } from "@/types/car-data"
+import type { CarList } from "@/types/car-data"
 import { useRouter } from "next/navigation"
+import { Metric, METRICS } from "@/src/constants/metrics"
+
 type SortDirection = "asc" | "desc"
 
 interface LeaderboardTableProps {
   data: CarList[]
-  metric: TimeMetric
-  metricLabel: string
+  metric: Metric
 }
 
-export default function LeaderboardTable({ data, metric, metricLabel }: LeaderboardTableProps) {
+export default function LeaderboardTable({ data, metric, }: LeaderboardTableProps) {
   const [sortDirection, setSortDirection] = useState<SortDirection>("asc")
   const router = useRouter()
 
@@ -40,7 +41,7 @@ export default function LeaderboardTable({ data, metric, metricLabel }: Leaderbo
   }
 
   const handleRowClick = (userId: string, carId: string) => {
-    router.push(`/car/${userId}/${carId}`)
+    router.push(`/car/${userId}/${carId}?metric=${metric}`)
   }
   return (
     <div className="overflow-x-auto">
@@ -53,7 +54,7 @@ export default function LeaderboardTable({ data, metric, metricLabel }: Leaderbo
             <TableHead>Make & Model</TableHead>
             <TableHead>
               <button className="flex items-center gap-1" onClick={toggleSortDirection}>
-                {metricLabel}
+                {METRICS[metric].label}
                 {sortDirection === "asc" ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
               </button>
             </TableHead>
@@ -78,7 +79,7 @@ export default function LeaderboardTable({ data, metric, metricLabel }: Leaderbo
                 <TableCell className="text-center font-medium">
                   <Link 
                     id={`car-link-${car.id}`}
-                    href={`/car/${car.userId}/${car.id}`}
+                    href={`/car/${car.userId}/${car.id}?metric=${metric}`}
                     className="hidden"
                   />
                   {index < 3 ? (
