@@ -10,8 +10,11 @@ export async function GET(request: Request) {
     const id = url.searchParams.get("id");
 
     if (!id) {
+      console.log('Details: No id provided')
       return NextResponse.json({ error: "No id provided" }, { status: 400 })
     }
+
+    console.log('Details: id provided', id)
     
     const myHeaders = new Headers();
     myHeaders.append("Proxy-Connection", "keep-alive");
@@ -38,9 +41,18 @@ export async function GET(request: Request) {
     
     const response = await fetch("http://app.godragy.com/index.php/u_user/get_CarResults", requestOptions);
 
+    if (!response.ok) {
+      console.log('Details: Failed to fetch car data')
+      return NextResponse.json({ error: "Failed to fetch car data" }, { status: 500 })
+    }
+
     const json = await response.json() as CarDetailsResponse;
 
+    console.log('Details: Car data fetched successfully');
+    console.debug(json);
+
     if (!json.data.carResults) {
+      console.log('Details: No car details data available')
       return NextResponse.json({ error: "No car details data available" }, { status: 404 })
     }
 
