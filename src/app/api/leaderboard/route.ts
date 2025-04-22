@@ -1,10 +1,8 @@
 import { NextResponse } from "next/server"
-import { CarListResponse } from "@/types/car-data";
+import { CarList, CarListResponse } from "@/types/car-data";
 import { COUNTRY_CODES } from "@/src/constants/countries";
-import { mockLeaderBoardData60, mockLeaderBoardData100 } from "../mock-data";
 
-// export async function GET(request: Request): Promise<NextResponse<CarListResponse> | NextResponse<{ error: string }>> {
-    export async function GET(request: Request) {
+export async function GET(request: Request): Promise<NextResponse<CarList[]> | NextResponse<{ error: string }>> {
   try {
     const { searchParams } = new URL(request.url)
     const country = searchParams.get("country") || "global"
@@ -48,13 +46,8 @@ import { mockLeaderBoardData60, mockLeaderBoardData100 } from "../mock-data";
 
     return NextResponse.json(json.data.car_list);
 
-    // if (group === "0") {
-    //   return NextResponse.json(mockLeaderBoardData60.data.car_list)
-    // } else {
-    //   return NextResponse.json(mockLeaderBoardData100.data.car_list)
-    // }
   } catch (error) {
-    console.error("API error:", error)
-    return NextResponse.json({ error: "Failed to fetch car data" }, { status: 500 })
+    console.error("Leaderboard API error:", error)
+    return NextResponse.json({ error: "Failed to fetch leaderboard data" }, { status: 500 })
   }
 }

@@ -4,6 +4,7 @@ import useGetLeaderboardData from "../app/hooks/getLeaderboardData";
 import { Country } from "../constants/countries";
 import LeaderboardTable from "./leaderboard-table";
 import { Metric } from "../constants/metrics";
+import { Loader2 } from "lucide-react";
 
 interface LeaderboardTableProps {
   selectedCountry: Country;
@@ -20,14 +21,21 @@ export default function LeaderboardContent({
   selectedCountry,
   currentMetric,
 }: LeaderboardTableProps) {
-  const { data: carData } = useGetLeaderboardData({
+  const { data: carData, isLoading } = useGetLeaderboardData({
     country: selectedCountry,
-    group: metricLabels[currentMetric] === "0-100 km/h" ? "0" : "1",
     metric: currentMetric,
   });
 
+  if (isLoading) {
+    return (
+      <div className="flex justify-center py-16">
+        <Loader2 className="h-10 w-10 animate-spin text-primary" />
+      </div>
+    );
+  }
+
   if (!carData || carData.length === 0) {
-    return <div>No data available</div>;
+    return <div className="py-8 text-center text-muted-foreground">No data available</div>;
   }
 
   return (

@@ -10,11 +10,9 @@ import {
 import { Badge } from "@/src/components/ui/badge";
 import { PerformanceChart } from "@/src/components/performance-chart";
 import { HistoricalDataTable } from "@/src/components/HistoricalDataTable";
-import useGetCarTimeData from "@/src/app/hooks/getCarTimeData";
 import useGetUserAndTimeData from "@/src/app/hooks/getUserAndTimeData";
 import { DataInfo } from "@/types/car-data";
 import { IntervalDataTable } from "./IntervalDataTable";
-import { Tabs, TabsList, TabsTrigger } from "./ui/tabs";
 
 interface CarDetailsContentProps {
   userId: string;
@@ -27,8 +25,6 @@ export function CarDetailsContent({ userId, carId }: CarDetailsContentProps) {
   const userData = data?.userData[0];
   const timeData = data?.timeData;
   const graphData = data?.graphData;
-
-  console.log("userDataResponse", userData, timeData, graphData);
 
   if (!timeData || !userData || !graphData || timeData?.length === 0) {
     return (
@@ -83,21 +79,30 @@ export function CarDetailsContent({ userId, carId }: CarDetailsContentProps) {
         acceleration: parseFloat(item.acceleration.toFixed(2)),
       }));
 
+      // Find the nearest hundred ceiling for the max speed
+      const maxSpeed = Math.max(...timeDataWithTimes.map(item => item.speed));
+      const speedCeiling = Math.ceil(maxSpeed / 100) * 100;
+
       const speedData = timeDataWithTimes
         .map((item) => ({
           time: item.time,
           speed: parseFloat(item.speed.toFixed(0)),
         }))
-        .filter((item) => item.speed <= 100);
+        .filter((item) => item.speed <= speedCeiling);
 
-      //   Add a base 0 point
+      // Add a base 0 point
       accelerationData.unshift({
         time: 0,
         acceleration: 0,
       });
+      
+      // Get the starting speed from the data if available
+      const startingSpeed = timeDataWithTimes.length > 0 ? 
+        parseFloat(timeDataWithTimes[0].speed.toFixed(0)) : 0;
+      
       speedData.unshift({
         time: 0,
-        speed: 0,
+        speed: startingSpeed
       });
 
       return {
@@ -116,12 +121,6 @@ export function CarDetailsContent({ userId, carId }: CarDetailsContentProps) {
   };
 
   const timeSeriesData = buildTimeSeriesData();
-
-  const metricLabels = {
-    zeroToHundred: "0-100 km/h",
-    hundredToTwoHundred: "100-200 km/h",
-    quarterMile: "1/4 Mile",
-  };
 
   return (
     <div className="space-y-6">
@@ -162,22 +161,6 @@ export function CarDetailsContent({ userId, carId }: CarDetailsContentProps) {
           </div>
         </CardHeader>
         <CardContent className="p-0">
-          <div className="border-b px-6">
-            <Tabs>
-            <TabsList className="flex h-12 w-full justify-start rounded-none border-b-0 bg-transparent p-0">
-              {Object.entries(metricLabels).map(([key, label]) => (
-                <TabsTrigger
-                  key={key}
-                  value={key}
-                  onClick={() => console.log(key)}
-                  className="relative h-12 rounded-none border-b-2 border-transparent bg-transparent px-4 py-3 font-medium text-muted-foreground transition-colors hover:text-foreground data-[state=active]:border-primary data-[state=active]:text-foreground data-[state=active]:shadow-none"
-                >
-                  {label}
-                </TabsTrigger>
-              ))}
-            </TabsList>
-            </Tabs>
-          </div>
           <div className="p-6">
             <div className="space-y-6">
               <div className="h-[350px] w-full">

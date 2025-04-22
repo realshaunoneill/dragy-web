@@ -64,7 +64,7 @@ export function IntervalDataTable({ intervalData }: IntervalDataTableProps) {
               {leftColumnIntervals.map((interval) => (
                 <TableRow key={interval.name}>
                   <TableCell className="font-medium">{interval.name}</TableCell>
-                  <TableCell className="text-right font-bold text-primary">{interval.time.toFixed(2)}s</TableCell>
+                  <TableCell className="text-right font-bold text-primary">{formatTime(interval.time)}</TableCell>
                 </TableRow>
               ))}
             </TableBody>
@@ -84,7 +84,7 @@ export function IntervalDataTable({ intervalData }: IntervalDataTableProps) {
               {rightColumnIntervals.map((interval) => (
                 <TableRow key={interval.name}>
                   <TableCell className="font-medium">{interval.name}</TableCell>
-                  <TableCell className="text-right font-bold text-primary">{interval.time.toFixed(2)}s</TableCell>
+                  <TableCell className="text-right font-bold text-primary">{formatTime(interval.time)}</TableCell>
                 </TableRow>
               ))}
               {/* Add empty rows if right column has fewer items than left column */}

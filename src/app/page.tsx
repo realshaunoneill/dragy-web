@@ -88,7 +88,7 @@ export default function Home() {
               {Object.entries(METRICS).map(([key, metric]) => (
                 <TabsTrigger
                   key={key}
-                  value={metric.value}
+                  value={key}
                   className="relative h-12 rounded-none border-b-2 border-transparent bg-transparent px-4 py-3 font-medium text-muted-foreground transition-colors hover:text-foreground data-[state=active]:border-primary data-[state=active]:text-foreground data-[state=active]:shadow-none"
                 >
                   {metric.label}
@@ -97,11 +97,11 @@ export default function Home() {
             </TabsList>
           </div>
 
-          {Object.keys(METRICS).map((metric) => (
-            <TabsContent key={metric} value={metric} className="p-0">
+          {Object.entries(METRICS).map(([key]) => (
+            <TabsContent key={key} value={key} className="p-0">
               <DynamicLeaderboardContent
                 selectedCountry={selectedCountry}
-                currentMetric={metric as Metric}
+                currentMetric={key as Metric}
               />
             </TabsContent>
           ))}

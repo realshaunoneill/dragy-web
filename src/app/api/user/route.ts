@@ -28,8 +28,7 @@ export async function GET(request: Request) {
 
     console.log('User details fetched successfully - ', json.data.data[0].username);
 
-    return NextResponse.json(json.data.data)
-    // return NextResponse.json(mockUserDetailsData.data.data)
+    return NextResponse.json(json.data.data);
   } catch (error) {
     console.error("API error:", error)
     return NextResponse.json({ error: "Failed to fetch user data: " + (error instanceof Error ? error.message : String(error)) }, { status: 500 })
